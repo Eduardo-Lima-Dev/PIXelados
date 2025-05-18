@@ -124,14 +124,45 @@ exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
   email: 'email',
-  pixKey: 'pixKey',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  emailVerified: 'emailVerified',
+  image: 'image',
+  password: 'password',
+  houseId: 'houseId'
+};
+
+exports.Prisma.AccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  provider: 'provider',
+  providerAccountId: 'providerAccountId',
+  refresh_token: 'refresh_token',
+  access_token: 'access_token',
+  expires_at: 'expires_at',
+  token_type: 'token_type',
+  scope: 'scope',
+  id_token: 'id_token',
+  session_state: 'session_state'
+};
+
+exports.Prisma.SessionScalarFieldEnum = {
+  id: 'id',
+  sessionToken: 'sessionToken',
+  userId: 'userId',
+  expires: 'expires'
+};
+
+exports.Prisma.VerificationTokenScalarFieldEnum = {
+  identifier: 'identifier',
+  token: 'token',
+  expires: 'expires'
 };
 
 exports.Prisma.HouseScalarFieldEnum = {
   id: 'id',
-  ownerId: 'ownerId',
+  name: 'name',
+  address: 'address',
+  inviteCode: 'inviteCode',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -140,22 +171,13 @@ exports.Prisma.ExpenseScalarFieldEnum = {
   id: 'id',
   title: 'title',
   amount: 'amount',
-  paid: 'paid',
-  recurring: 'recurring',
-  shared: 'shared',
   dueDate: 'dueDate',
+  description: 'description',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  createdById: 'createdById',
-  houseId: 'houseId'
-};
-
-exports.Prisma.ExpenseParticipantScalarFieldEnum = {
-  id: 'id',
-  expenseId: 'expenseId',
-  userId: 'userId',
-  amount: 'amount',
-  paid: 'paid'
+  houseId: 'houseId',
+  paidById: 'paidById'
 };
 
 exports.Prisma.SortOrder = {
@@ -176,9 +198,11 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  Account: 'Account',
+  Session: 'Session',
+  VerificationToken: 'VerificationToken',
   House: 'House',
-  Expense: 'Expense',
-  ExpenseParticipant: 'ExpenseParticipant'
+  Expense: 'Expense'
 };
 
 /**
