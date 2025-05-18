@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { Prisma } from '@prisma/client'
 
 // Listar despesas (com filtros)
 export async function GET(request: Request) {
@@ -46,42 +49,113 @@ export async function GET(request: Request) {
 // Criar nova despesa
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const { title, amount, dueDate, recurring, createdById, houseId, participants } = body
-
-    if (!title || !amount || !dueDate || !createdById || !houseId) {
-      return NextResponse.json({ error: 'Campos obrigatórios faltando' }, { status: 400 })
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Você precisa estar autenticado' },
+        { status: 401 }
+      )
     }
 
-    const expense = await prisma.expense.create({
-      data: {
-        title,
-        amount: Number(amount),
-        dueDate: new Date(dueDate),
-        recurring: recurring ?? false,
-        createdById: Number(createdById),
-        houseId: Number(houseId),
-        participants: {
-          create: participants?.map((p: any) => ({
-            userId: Number(p.userId),
-            amount: Number(p.amount),
-            paid: p.paid ?? false
-          })) || []
-        }
-      },
-      include: {
-        participants: {
-          include: {
-            user: true
+    const body = await request.json()
+    console.log('Dados recebidos na API:', body)
+    const { title, description, amount, date, category, recurring, createdById, houseId } = body
+
+    // Validações básicas
+    const missingFields = []
+    if (!title) missingFields.push('title')
+    if (!description) missingFields.push('description')
+    if (!amount) missingFields.push('amount')
+    if (!date) missingFields.push('date')
+    if (!category) missingFields.push('category')
+    if (!createdById) missingFields.push('createdById')
+    if (!houseId) missingFields.push('houseId')
+
+    if (missingFields.length > 0) {
+      console.log('Campos faltando:', missingFields)
+      return NextResponse.json(
+        { error: 'Campos obrigatórios faltando', fields: missingFields },
+        { status: 400 }
+      )
+    }
+
+    // Busca o usuário
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email }
+    })
+
+    if (!user) {
+      console.log('Usuário não encontrado:', session.user.email)
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      )
+    }
+
+    // Verifica se o usuário é membro da casa
+    const house = await prisma.house.findFirst({
+      where: {
+        id: houseId,
+        members: {
+          some: {
+            id: user.id
           }
-        },
-        createdBy: true
+        }
       }
     })
 
-    return NextResponse.json(expense, { status: 201 })
+    if (!house) {
+      console.log('Casa não encontrada ou usuário não é membro:', { houseId, userId: user.id })
+      return NextResponse.json(
+        { error: 'Você não é membro desta casa' },
+        { status: 403 }
+      )
+    }
+
+    console.log('Criando despesa com dados:', {
+      title,
+      description,
+      amount: Number(amount),
+      date: new Date(date),
+      category,
+      recurring,
+      houseId,
+      createdById: Number(createdById)
+    })
+
+    // Cria a despesa
+    const expenseData = {
+      title,
+      description,
+      amount: Number(amount),
+      date: new Date(date),
+      category,
+      recurring: recurring || false,
+      houseId,
+      createdById: Number(createdById),
+      status: 'pending',
+      participants: {
+        create: {
+          userId: Number(createdById),
+          amount: Number(amount),
+          paid: true
+        }
+      }
+    }
+
+    console.log('Dados da despesa:', expenseData)
+
+    const expense = await prisma.expense.create({
+      data: expenseData
+    })
+
+    console.log('Despesa criada com sucesso:', expense)
+    return NextResponse.json(expense)
   } catch (error) {
-    console.error('Erro ao criar despesa:', error)
-    return NextResponse.json({ error: 'Erro ao criar despesa' }, { status: 500 })
+    console.error('Erro detalhado ao criar despesa:', error)
+    return NextResponse.json(
+      { error: 'Erro ao criar despesa', details: error instanceof Error ? error.message : 'Erro desconhecido' },
+      { status: 500 }
+    )
   }
 } 

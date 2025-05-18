@@ -1,37 +1,67 @@
 import React from 'react'
 
-export default function ExpenseList({ expenses }: { expenses: any[] }) {
+interface ExpenseListProps {
+  expenses: any[]
+}
+
+export default function ExpenseList({ expenses }: ExpenseListProps) {
   if (!expenses.length) return <div className="text-gray-400 text-center py-8">Nenhuma despesa encontrada.</div>
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-[#23243a] rounded-xl">
-        <thead>
-          <tr className="text-gray-400 text-sm">
-            <th className="py-2 px-4">Título</th>
-            <th className="py-2 px-4">Valor</th>
-            <th className="py-2 px-4">Responsável</th>
-            <th className="py-2 px-4">Status</th>
-            <th className="py-2 px-4">Recorrente</th>
-            <th className="py-2 px-4">Categoria</th>
-            <th className="py-2 px-4">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {expenses.map((expense) => (
-            <tr key={expense.id} className="border-b border-[#31324d] text-gray-200">
-              <td className="py-2 px-4">{expense.title}</td>
-              <td className="py-2 px-4">R$ {Number(expense.amount).toFixed(2)}</td>
-              <td className="py-2 px-4">{expense.createdBy?.name || '-'}</td>
-              <td className="py-2 px-4">
-                {expense.paid ? <span className="text-green-400">Pago</span> : <span className="text-red-400">Pendente</span>}
-              </td>
-              <td className="py-2 px-4">{expense.recurring ? 'Sim' : 'Não'}</td>
-              <td className="py-2 px-4">{expense.category || '-'}</td>
-              <td className="py-2 px-4">-</td>
+    <div className="mt-6">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-700">
+          <thead>
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Título
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Descrição
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Valor
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Data
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Categoria
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Status
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-gray-700">
+            {expenses.map((expense) => (
+              <tr key={expense.id}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                  {expense.title}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {expense.description}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                  R$ {expense.amount.toFixed(2)}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {new Date(expense.date).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {expense.category}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    expense.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {expense.status === 'paid' ? 'Pago' : 'Pendente'}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 } 

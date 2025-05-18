@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,70 +8,72 @@ datasource db {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  name          String
-  email         String    @unique
-  password      String
-  pixKey        String?
-  houses        House[]   @relation("HouseMembers")
-  ownedHouses   House[]   @relation("HouseOwner")
-  expenses      Expense[] @relation("UserExpenses")
-  payments      Payment[]
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  email               String               @unique
+  pixKey              String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  password            String
   expenseParticipants ExpenseParticipant[] @relation("UserExpenseParticipants")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  ownedHouses         House[]              @relation("HouseOwner")
+  payments            Payment[]
+  expenses            Expense[]            @relation("UserExpenses")
+  houses              House[]              @relation("HouseMembers")
 }
 
 model House {
-  id            Int       @id @default(autoincrement())
-  name          String    @default("Nova Casa")
-  inviteCode    String?   @unique
-  uuid          String    @unique @default(uuid())
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  owner         User      @relation("HouseOwner", fields: [ownerId], references: [id])
-  ownerId       Int
-  members       User[]    @relation("HouseMembers")
-  expenses      Expense[]
+  id         Int       @id @default(autoincrement())
+  ownerId    Int
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  inviteCode String?   @unique
+  name       String    @default("Nova Casa")
+  uuid       String    @unique @default(uuid())
+  owner      User      @relation("HouseOwner", fields: [ownerId], references: [id])
+  expenses   Expense[]
+  members    User[]    @relation("HouseMembers")
 }
 
 model Expense {
-  id            Int       @id @default(autoincrement())
-  description   String
-  amount        Float
-  date          DateTime
-  category      String?
-  status        String   @default("pending")
-  recurring     Boolean  @default(false)
-  house         House     @relation(fields: [houseId], references: [id])
-  houseId       Int
-  createdById   Int
-  createdBy     User      @relation("UserExpenses", fields: [createdById], references: [id])
-  participants  ExpenseParticipant[]
-  payments      Payment[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id           Int                  @id @default(autoincrement())
+  title        String
+  description  String
+  amount       Float
+  date         DateTime
+  category     String?
+  status       String               @default("pending")
+  recurring    Boolean              @default(false)
+  houseId      Int
+  createdById  Int
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  participants ExpenseParticipant[]
+  payments     Payment[]
+  createdBy    User                 @relation("UserExpenses", fields: [createdById], references: [id])
+  house        House                @relation(fields: [houseId], references: [id])
+
+  @@map("expenses")
 }
 
 model ExpenseParticipant {
   id        Int     @id @default(autoincrement())
-  expense   Expense @relation(fields: [expenseId], references: [id])
   expenseId Int
-  user      User    @relation("UserExpenseParticipants", fields: [userId], references: [id])
   userId    Int
   amount    Decimal
   paid      Boolean @default(false)
+  expense   Expense @relation(fields: [expenseId], references: [id])
+  user      User    @relation("UserExpenseParticipants", fields: [userId], references: [id])
 }
 
 model Payment {
-  id          Int       @id @default(autoincrement())
-  amount      Float
-  date        DateTime
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  expense     Expense   @relation(fields: [expenseId], references: [id])
-  expenseId   Int
-  user        User      @relation(fields: [userId], references: [id])
-  userId      Int
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  date      DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expenseId Int
+  userId    Int
+  expense   Expense  @relation(fields: [expenseId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
-

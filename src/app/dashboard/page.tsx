@@ -8,6 +8,7 @@ import ExpenseList from '@/components/ExpenseList'
 import InviteButton from '@/components/InviteButton'
 import TotalsCard from '@/components/TotalsCard'
 import Filters from '@/components/Filters'
+import AddExpenseModal from '@/components/AddExpenseModal'
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
@@ -17,6 +18,30 @@ export default function DashboardPage() {
   const [filters, setFilters] = useState<any>({})
   const [houseId, setHouseId] = useState<number | null>(null)
   const [categories, setCategories] = useState<string[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedHouseId, setSelectedHouseId] = useState<number | null>(null)
+
+  const loadExpenses = async () => {
+    if (!houseId) return
+
+    const params = new URLSearchParams({ houseId: String(houseId) })
+    if (filters.category) params.append('category', filters.category)
+    if (filters.status) params.append('status', filters.status)
+    if (filters.userId) params.append('userId', filters.userId)
+    if (filters.recurring) params.append('recurring', filters.recurring)
+
+    try {
+      const res = await fetch(`/api/expenses?${params.toString()}`)
+      const data = await res.json()
+      if (Array.isArray(data)) {
+        setExpenses(data)
+        // Extrai categorias únicas
+        setCategories([...new Set(data.map(e => e.category).filter(Boolean))])
+      }
+    } catch (err) {
+      console.error('Erro ao buscar despesas:', err)
+    }
+  }
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -40,24 +65,7 @@ export default function DashboardPage() {
   }, [status])
 
   useEffect(() => {
-    if (!houseId) return
-
-    const params = new URLSearchParams({ houseId: String(houseId) })
-    if (filters.category) params.append('category', filters.category)
-    if (filters.status) params.append('status', filters.status)
-    if (filters.userId) params.append('userId', filters.userId)
-    if (filters.recurring) params.append('recurring', filters.recurring)
-
-    fetch(`/api/expenses?${params.toString()}`)
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setExpenses(data)
-          // Extrai categorias únicas
-          setCategories([...new Set(data.map(e => e.category).filter(Boolean))])
-        }
-      })
-      .catch(err => console.error('Erro ao buscar despesas:', err))
+    loadExpenses()
   }, [houseId, filters])
 
   if (status === 'loading') {
@@ -75,11 +83,23 @@ export default function DashboardPage() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-white">Despesas da Casa</h1>
           {houseId && <InviteButton houseId={houseId} />}
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+          >
+            Nova Despesa
+          </button>
         </div>
         <TotalsCard users={users} expenses={expenses} />
         <Filters filters={filters} setFilters={setFilters} users={users} categories={categories} />
         <ExpenseList expenses={expenses} />
       </main>
+      <AddExpenseModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        houseId={houseId || 0}
+        onExpenseCreated={loadExpenses}
+      />
     </div>
   )
 } 
