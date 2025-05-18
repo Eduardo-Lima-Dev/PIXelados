@@ -22,41 +22,9 @@ export default function JoinPage({ params }: { params: { code: string } }) {
   }, [status, router, params.code, session])
 
   const handleJoin = async () => {
-    if (!session?.user?.id) {
-      console.log('Usuário não autenticado ao tentar entrar na casa')
-      toast.error('Você precisa estar logado para entrar na casa')
-      return
-    }
-
-    setLoading(true)
-    try {
-      console.log('Tentando entrar na casa com código:', params.code)
-      console.log('ID do usuário:', session.user.id)
-
-      const res = await fetch('/api/houses/join', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          code: params.code,
-          userId: session.user.id
-        })
-      })
-
-      const data = await res.json()
-      console.log('Resposta da API:', data)
-
-      if (res.ok) {
-        toast.success('Você entrou na casa com sucesso!')
-        router.push('/dashboard')
-      } else {
-        toast.error(data.error || 'Erro ao entrar na casa')
-      }
-    } catch (error) {
-      console.error('Erro ao entrar na casa:', error)
-      toast.error('Erro ao entrar na casa')
-    } finally {
-      setLoading(false)
-    }
+    // Sempre redireciona para o registro
+    const callbackUrl = `/join/${params.code}`
+    router.push(`/login?mode=register&callbackUrl=${encodeURIComponent(callbackUrl)}`)
   }
 
   if (status === 'loading') {

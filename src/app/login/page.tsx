@@ -100,7 +100,32 @@ export default function LoginPage() {
         throw new Error(loginResult.error)
       }
 
-      router.push(callbackUrl)
+      // Se houver um código de convite na URL, adiciona o usuário à casa
+      const code = callbackUrl.split('/join/')[1]
+      if (code) {
+        try {
+          const joinResponse = await fetch('/api/houses/join', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code }),
+          })
+
+          if (joinResponse.ok) {
+            toast.success('Você foi adicionado à casa com sucesso!')
+            router.push('/dashboard')
+          } else {
+            const errorData = await joinResponse.json()
+            toast.error(errorData.error || 'Erro ao entrar na casa')
+            router.push('/dashboard')
+          }
+        } catch (error) {
+          console.error('Erro ao entrar na casa:', error)
+          toast.error('Erro ao entrar na casa')
+          router.push('/dashboard')
+        }
+      } else {
+        router.push('/dashboard')
+      }
     } catch (error) {
       console.error('Erro ao criar conta:', error)
       toast.error(error instanceof Error ? error.message : 'Erro ao criar conta. Tente novamente.')
