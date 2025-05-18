@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -15,44 +14,51 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String    @unique
-  pixKey    String?
-  houses    House[]   @relation("UserHouses")
-  ownedHouses House[] @relation("HouseOwner")
-  expenses  Expense[] @relation("UserExpenses")
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  password      String
+  pixKey        String?
+  houses        House[]   @relation("HouseMembers")
+  ownedHouses   House[]   @relation("HouseOwner")
+  expenses      Expense[] @relation("UserExpenses")
+  payments      Payment[]
   expenseParticipants ExpenseParticipant[] @relation("UserExpenseParticipants")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model House {
-  id        Int       @id @default(autoincrement())
-  ownerId   Int
-  owner     User      @relation("HouseOwner", fields: [ownerId], references: [id])
-  members   User[]    @relation("UserHouses")
-  expenses  Expense[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            Int       @id @default(autoincrement())
+  name          String    @default("Nova Casa")
+  inviteCode    String?   @unique
+  uuid          String    @unique @default(uuid())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  owner         User      @relation("HouseOwner", fields: [ownerId], references: [id])
+  ownerId       Int
+  members       User[]    @relation("HouseMembers")
+  expenses      Expense[]
 }
 
 model Expense {
-  id           Int       @id @default(autoincrement())
-  title        String
-  amount       Decimal
-  paid         Boolean   @default(false)
-  recurring    Boolean   @default(false)
-  shared       Boolean   @default(false)
-  dueDate      DateTime
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  createdById  Int
-  createdBy    User      @relation("UserExpenses", fields: [createdById], references: [id])
-  houseId      Int
-  house        House     @relation(fields: [houseId], references: [id])
-  participants ExpenseParticipant[]
+  id            Int       @id @default(autoincrement())
+  description   String
+  amount        Float
+  date          DateTime
+  category      String?
+  status        String   @default("pending")
+  recurring     Boolean  @default(false)
+  house         House     @relation(fields: [houseId], references: [id])
+  houseId       Int
+  createdById   Int
+  createdBy     User      @relation("UserExpenses", fields: [createdById], references: [id])
+  participants  ExpenseParticipant[]
+  payments      Payment[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
+
 model ExpenseParticipant {
   id        Int     @id @default(autoincrement())
   expense   Expense @relation(fields: [expenseId], references: [id])
@@ -61,5 +67,17 @@ model ExpenseParticipant {
   userId    Int
   amount    Decimal
   paid      Boolean @default(false)
+}
+
+model Payment {
+  id          Int       @id @default(autoincrement())
+  amount      Float
+  date        DateTime
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  expense     Expense   @relation(fields: [expenseId], references: [id])
+  expenseId   Int
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
 }
 
