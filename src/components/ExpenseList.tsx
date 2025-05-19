@@ -5,7 +5,7 @@ interface ExpenseListProps {
 }
 
 export default function ExpenseList({ expenses }: ExpenseListProps) {
-  if (!expenses.length) {
+  if (!expenses || expenses.length === 0) {
     return (
       <div className="rounded-xl bg-[#1a2332] p-8 text-center shadow-lg">
         <p className="text-gray-400">Nenhuma despesa encontrada</p>
@@ -24,6 +24,7 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Valor</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Status</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Data</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Criado por</th>
             </tr>
           </thead>
           <tbody>
@@ -32,7 +33,7 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
                 <td className="px-4 py-3 text-sm text-white">{expense.description}</td>
                 <td className="px-4 py-3 text-sm text-gray-300">{expense.category}</td>
                 <td className="px-4 py-3 text-sm font-medium text-white">
-                  R$ {expense.value.toFixed(2)}
+                  R$ {expense.amount.toFixed(2)}
                 </td>
                 <td className="px-4 py-3 text-sm">
                   <span
@@ -47,6 +48,9 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-300">
                   {new Date(expense.date).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-300">
+                  {expense.createdBy?.name || 'N/A'}
                 </td>
               </tr>
             ))}

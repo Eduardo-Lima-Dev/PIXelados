@@ -1,6 +1,8 @@
 'use client'
 
 import { SessionProvider } from 'next-auth/react'
+import { Suspense } from 'react'
+import DashboardLoading from './loading'
 
 export default function DashboardLayout({
   children,
@@ -9,7 +11,9 @@ export default function DashboardLayout({
 }) {
   return (
     <SessionProvider>
-      {children}
+      <Suspense fallback={<DashboardLoading />}>
+        {children}
+      </Suspense>
     </SessionProvider>
   )
 } 

@@ -4,7 +4,14 @@ import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import 'swagger-ui-react/swagger-ui.css';
 
-const SwaggerUI = dynamic(() => import('swagger-ui-react'), { ssr: false });
+const SwaggerUI = dynamic(() => import('swagger-ui-react'), { 
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+    </div>
+  )
+});
 
 export default function ApiDocs() {
   const [spec, setSpec] = useState<any>(null);
@@ -14,10 +21,6 @@ export default function ApiDocs() {
       .then((response) => response.json())
       .then((data) => setSpec(data));
   }, []);
-
-  if (!spec) {
-    return <div className="flex items-center justify-center min-h-screen bg-white">Carregando documentação...</div>;
-  }
 
   return (
     <div className="min-h-screen bg-white">

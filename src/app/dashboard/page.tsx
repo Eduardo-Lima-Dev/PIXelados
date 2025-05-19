@@ -79,12 +79,12 @@ export default function DashboardPage() {
   }, [houseId, filters])
 
   // Filtra despesas do mês selecionado
-  const filteredExpenses = expenses.filter(exp => {
-    const date = new Date(exp.date)
-    return (
-      date.getMonth() === currentMonth.month &&
-      date.getFullYear() === currentMonth.year
-    )
+  const filteredExpenses = expenses.filter((expense) => {
+    if (filters.category && expense.category !== filters.category) return false
+    if (filters.userId && expense.createdBy?.id !== filters.userId) return false
+    if (filters.status && expense.status !== filters.status) return false
+    if (filters.recurring !== '' && expense.recurring !== (filters.recurring === 'true')) return false
+    return true
   })
 
   // Funções para navegar entre meses
@@ -103,14 +103,6 @@ export default function DashboardPage() {
       }
       return { month: prev.month + 1, year: prev.year }
     })
-  }
-
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0c0c1f] via-[#0d102b] to-[#10141e]">
-        <div className="text-white">Carregando...</div>
-      </div>
-    )
   }
 
   return (

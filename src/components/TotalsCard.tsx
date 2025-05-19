@@ -6,27 +6,25 @@ interface TotalsCardProps {
 }
 
 export default function TotalsCard({ users, expenses }: TotalsCardProps) {
-  const totalExpenses = expenses.reduce((acc, exp) => acc + exp.value, 0);
-  const perPerson = totalExpenses / (users.length || 1);
+  const totalExpenses = expenses.reduce((acc, expense) => {
+    const amount = Number(expense.amount) || 0
+    return acc + amount
+  }, 0)
+
+  const totalPerPerson = users.length > 0 ? totalExpenses / users.length : 0
 
   return (
-    <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      <div className="rounded-xl bg-[#1a2332] p-6 shadow-lg">
-        <h3 className="mb-2 text-sm font-medium text-gray-400">Total de Despesas</h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="bg-[#1a2332] rounded-xl p-6 shadow-lg">
+        <h3 className="text-sm font-medium text-gray-400 mb-2">Total de Despesas</h3>
         <p className="text-2xl font-bold text-white">
           R$ {totalExpenses.toFixed(2)}
         </p>
       </div>
-      <div className="rounded-xl bg-[#1a2332] p-6 shadow-lg">
-        <h3 className="mb-2 text-sm font-medium text-gray-400">Por Pessoa</h3>
+      <div className="bg-[#1a2332] rounded-xl p-6 shadow-lg">
+        <h3 className="text-sm font-medium text-gray-400 mb-2">Por Pessoa</h3>
         <p className="text-2xl font-bold text-white">
-          R$ {perPerson.toFixed(2)}
-        </p>
-      </div>
-      <div className="rounded-xl bg-[#1a2332] p-6 shadow-lg">
-        <h3 className="mb-2 text-sm font-medium text-gray-400">Membros</h3>
-        <p className="text-2xl font-bold text-white">
-          {users.length}
+          R$ {totalPerPerson.toFixed(2)}
         </p>
       </div>
     </div>
