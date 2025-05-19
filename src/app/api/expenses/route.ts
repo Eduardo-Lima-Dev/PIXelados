@@ -1,3 +1,127 @@
+/**
+ * @swagger
+ * /api/expenses:
+ *   get:
+ *     summary: Lista todas as despesas da casa atual
+ *     tags: [Despesas]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: month
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Mês para filtrar as despesas (YYYY-MM)
+ *     responses:
+ *       200:
+ *         description: Lista de despesas retornada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   title:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   amount:
+ *                     type: number
+ *                   date:
+ *                     type: string
+ *                     format: date
+ *                   category:
+ *                     type: string
+ *                   recurring:
+ *                     type: boolean
+ *                   createdBy:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *       401:
+ *         description: Não autorizado
+ *       500:
+ *         description: Erro interno do servidor
+ * 
+ *   post:
+ *     summary: Cria uma nova despesa
+ *     tags: [Despesas]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - amount
+ *               - date
+ *               - category
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: Título da despesa
+ *               description:
+ *                 type: string
+ *                 description: Descrição da despesa
+ *               amount:
+ *                 type: number
+ *                 description: Valor da despesa
+ *               date:
+ *                 type: string
+ *                 format: date
+ *                 description: Data da despesa
+ *               category:
+ *                 type: string
+ *                 description: Categoria da despesa
+ *               recurring:
+ *                 type: boolean
+ *                 description: Se a despesa é recorrente
+ *     responses:
+ *       201:
+ *         description: Despesa criada com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 title:
+ *                   type: string
+ *                 description:
+ *                   type: string
+ *                 amount:
+ *                   type: number
+ *                 date:
+ *                   type: string
+ *                   format: date
+ *                 category:
+ *                   type: string
+ *                 recurring:
+ *                   type: boolean
+ *                 createdBy:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *       401:
+ *         description: Não autorizado
+ *       500:
+ *         description: Erro interno do servidor
+ */
+
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
