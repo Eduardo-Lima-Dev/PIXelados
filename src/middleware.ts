@@ -12,8 +12,15 @@ export async function middleware(request: NextRequest) {
   // Protege a rota /dashboard
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
     if (!token) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      const url = new URL('/login', request.url)
+      url.searchParams.set('callbackUrl', request.nextUrl.pathname)
+      return NextResponse.redirect(url)
     }
+  }
+
+  // Redireciona usuários autenticados da página de login para o dashboard
+  if (request.nextUrl.pathname === '/login' && token) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return NextResponse.next()

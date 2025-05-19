@@ -63,8 +63,9 @@ export default function LoginForm() {
 
       if (result?.ok) {
         toast.success('Login realizado com sucesso!')
-        router.push('/dashboard')
-        router.refresh()
+        setTimeout(() => {
+          router.push('/dashboard')
+        }, 100)
       }
     } catch (error) {
       console.error('Erro no login:', error)
