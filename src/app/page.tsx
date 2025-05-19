@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import FeatureCard from "@/components/FeatureCard";
 import TechItem from "@/components/TechItem";
+import "devicon/devicon.min.css";
 
 export default function Home() {
   return (
@@ -24,9 +25,10 @@ export default function Home() {
             </Link>
             <Link
               href="/login?mode=register"
-              className="rounded-xl bg-cyan-500 px-5 py-2 text-sm font-medium text-white shadow hover:bg-cyan-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="rounded-xl bg-cyan-500 px-5 py-2 text-sm font-medium text-white shadow hover:bg-cyan-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 relative group"
             >
-              Criar conta
+              <span className="absolute inset-0 rounded-xl bg-cyan-500 blur-md opacity-50 group-hover:opacity-75 transition-opacity"></span>
+              <span className="relative">Criar conta</span>
             </Link>
           </nav>
         </div>
@@ -56,9 +58,10 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
             <Link
               href="/login?mode=register"
-              className="rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 px-8 py-3 text-lg font-semibold text-white shadow-lg transition hover:brightness-110"
+              className="rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 px-8 py-3 text-lg font-semibold text-white shadow-lg transition hover:brightness-110 relative group"
             >
-              Começar agora
+              <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 blur-md opacity-50 group-hover:opacity-75 transition-opacity"></span>
+              <span className="relative">Começar agora</span>
             </Link>
             <a
               href="#features"
@@ -135,10 +138,34 @@ export default function Home() {
           </h3>
 
           <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            <TechItem label="Next.js" detail="SSR & SEO automágicos" />
-            <TechItem label="PostgreSQL" detail="Consistência bancária" />
-            <TechItem label="Tailwind&nbsp;CSS" detail="Design responsivo" />
-            <TechItem label="TypeScript" detail="Segurança de tipos" />
+            <TechItem 
+              label="Next.js" 
+              detail="SSR & SEO automágicos" 
+              icon={
+                <i className="devicon-nextjs-plain text-3xl"></i>
+              }
+            />
+            <TechItem 
+              label="PostgreSQL" 
+              detail="Consistência bancária" 
+              icon={
+                <i className="devicon-postgresql-plain text-3xl"></i>
+              }
+            />
+            <TechItem 
+              label="Tailwind CSS" 
+              detail="Design responsivo" 
+              icon={
+                <i className="devicon-tailwindcss-plain text-3xl"></i>
+              }
+            />
+            <TechItem 
+              label="TypeScript" 
+              detail="Segurança de tipos" 
+              icon={
+                <i className="devicon-typescript-plain text-3xl"></i>
+              }
+            />
           </ul>
         </div>
       </section>

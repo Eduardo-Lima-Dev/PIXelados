@@ -7,7 +7,7 @@ interface FeatureCardProps {
 export default function FeatureCard({ title, description, iconPath }: FeatureCardProps) {
   return (
     <div className="rounded-xl bg-[#1a2332] p-6 shadow-lg">
-      <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-500/10">
+      <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10">
         <svg
           className="h-6 w-6 text-cyan-400"
           fill="none"
