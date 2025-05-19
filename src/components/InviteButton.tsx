@@ -32,7 +32,7 @@ export default function InviteButton({ houseId }: { houseId: number }) {
       <button
         onClick={handleInvite}
         disabled={loading}
-        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md font-semibold shadow"
+        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-semibold shadow"
       >
         {loading ? 'Gerando...' : 'Gerar link de convite'}
       </button>
@@ -42,7 +42,7 @@ export default function InviteButton({ houseId }: { houseId: number }) {
             type="text"
             value={inviteLink}
             readOnly
-            className="bg-gray-800 text-gray-200 px-2 py-1 rounded w-56 text-xs"
+            className="bg-gray-800 text-gray-200 px-2 py-1 rounded-xl w-56 text-xs"
             onFocus={e => e.target.select()}
           />
           <button
