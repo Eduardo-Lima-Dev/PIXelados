@@ -19,6 +19,7 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-700">
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Nome</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Descrição</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Categoria</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Valor</th>
@@ -30,6 +31,7 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
           <tbody>
             {expenses.map((expense) => (
               <tr key={expense.id} className="border-b border-gray-700/50">
+                <td className="px-4 py-3 text-sm text-white">{expense.title}</td>
                 <td className="px-4 py-3 text-sm text-white">{expense.description}</td>
                 <td className="px-4 py-3 text-sm text-gray-300">{expense.category}</td>
                 <td className="px-4 py-3 text-sm font-medium text-white">
