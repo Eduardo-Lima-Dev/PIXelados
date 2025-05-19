@@ -33,7 +33,7 @@ export default function Home() {
       </header>
 
       {/* ==========================  HERO  ========================== */}
-      <section className="relative flex flex-1 items-center justify-center pt-24 pb-32">
+      <section className="relative flex flex-1 items-center justify-center pt-34 pb-32">
         {/* sutil glow */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="pointer-events-none absolute -top-20 left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-cyan-500 opacity-20 blur-[140px]" />
