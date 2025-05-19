@@ -18,13 +18,13 @@ export default function Home() {
           <nav className="flex items-center gap-2">
             <Link
               href="/login"
-              className="rounded-md px-4 py-2 text-sm font-medium text-gray-300 transition hover:text-white"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-300 transition hover:text-white"
             >
               Entrar
             </Link>
             <Link
               href="/login?mode=register"
-              className="rounded-md bg-cyan-500 px-5 py-2 text-sm font-medium text-white shadow hover:bg-cyan-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="rounded-xl bg-cyan-500 px-5 py-2 text-sm font-medium text-white shadow hover:bg-cyan-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
             >
               Criar conta
             </Link>
@@ -33,7 +33,7 @@ export default function Home() {
       </header>
 
       {/* ==========================  HERO  ========================== */}
-      <section className="relative flex flex-1 items-center justify-center pt-34 pb-32">
+      <section className="relative flex flex-1 items-center justify-center pt-44 pb-32">
         {/* sutil glow */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="pointer-events-none absolute -top-20 left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-cyan-500 opacity-20 blur-[140px]" />
@@ -56,13 +56,13 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
             <Link
               href="/login?mode=register"
-              className="rounded-lg bg-gradient-to-r from-cyan-500 to-indigo-500 px-8 py-3 text-lg font-semibold text-white shadow-lg transition hover:brightness-110"
+              className="rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 px-8 py-3 text-lg font-semibold text-white shadow-lg transition hover:brightness-110"
             >
               Começar agora
             </Link>
             <a
               href="#features"
-              className="group inline-flex items-center gap-2 text-base font-medium text-gray-300 transition hover:text-white"
+              className="group inline-flex items-center gap-2 rounded-lg text-base font-medium text-gray-300 transition hover:text-white"
             >
               Ver como funciona
               <svg
