@@ -1,28 +1,34 @@
 import React from 'react'
 
-export default function TotalsCard({ users, expenses }: { users: any[], expenses: any[] }) {
-  if (!users.length) return null
-  const total = expenses.reduce((acc, e) => acc + Number(e.amount), 0)
-  const equalShare = users.length ? total / users.length : 0
-  // Calcula o total atribuído a cada usuário
-  const userTotals = users.map(user => {
-    const userTotal = expenses.reduce((acc, e) => {
-      const part = e.participants?.find((p: any) => p.userId === user.id)
-      return acc + (part ? Number(part.amount) : 0)
-    }, 0)
-    return { ...user, total: userTotal }
-  })
+interface TotalsCardProps {
+  users: any[];
+  expenses: any[];
+}
+
+export default function TotalsCard({ users, expenses }: TotalsCardProps) {
+  const totalExpenses = expenses.reduce((acc, exp) => acc + exp.value, 0);
+  const perPerson = totalExpenses / (users.length || 1);
+
   return (
-    <div className="bg-[#23243a] rounded-xl p-4 mb-4 flex flex-col gap-2">
-      <div className="text-gray-300 text-sm mb-2">Divisão igualitária: <span className="font-bold text-blue-400">R$ {equalShare.toFixed(2)}</span> por pessoa</div>
-      <div className="flex flex-col gap-1">
-        {userTotals.map(u => (
-          <div key={u.id} className="flex justify-between text-gray-200 text-sm">
-            <span>{u.name}</span>
-            <span className="font-semibold">R$ {u.total.toFixed(2)}</span>
-          </div>
-        ))}
+    <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="rounded-xl bg-[#1a2332] p-6 shadow-lg">
+        <h3 className="mb-2 text-sm font-medium text-gray-400">Total de Despesas</h3>
+        <p className="text-2xl font-bold text-white">
+          R$ {totalExpenses.toFixed(2)}
+        </p>
+      </div>
+      <div className="rounded-xl bg-[#1a2332] p-6 shadow-lg">
+        <h3 className="mb-2 text-sm font-medium text-gray-400">Por Pessoa</h3>
+        <p className="text-2xl font-bold text-white">
+          R$ {perPerson.toFixed(2)}
+        </p>
+      </div>
+      <div className="rounded-xl bg-[#1a2332] p-6 shadow-lg">
+        <h3 className="mb-2 text-sm font-medium text-gray-400">Membros</h3>
+        <p className="text-2xl font-bold text-white">
+          {users.length}
+        </p>
       </div>
     </div>
-  )
+  );
 } 

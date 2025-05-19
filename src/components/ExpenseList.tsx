@@ -5,57 +5,48 @@ interface ExpenseListProps {
 }
 
 export default function ExpenseList({ expenses }: ExpenseListProps) {
-  if (!expenses.length) return <div className="text-gray-400 text-center py-8">Nenhuma despesa encontrada.</div>
+  if (!expenses.length) {
+    return (
+      <div className="rounded-xl bg-[#1a2332] p-8 text-center shadow-lg">
+        <p className="text-gray-400">Nenhuma despesa encontrada</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="mt-6">
+    <div className="rounded-xl bg-[#1a2332] p-6 shadow-lg">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-700">
+        <table className="w-full">
           <thead>
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Título
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Descrição
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Valor
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Data
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Categoria
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                Status
-              </th>
+            <tr className="border-b border-gray-700">
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Descrição</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Categoria</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Valor</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Status</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Data</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-700">
+          <tbody>
             {expenses.map((expense) => (
-              <tr key={expense.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                  {expense.title}
+              <tr key={expense.id} className="border-b border-gray-700/50">
+                <td className="px-4 py-3 text-sm text-white">{expense.description}</td>
+                <td className="px-4 py-3 text-sm text-gray-300">{expense.category}</td>
+                <td className="px-4 py-3 text-sm font-medium text-white">
+                  R$ {expense.value.toFixed(2)}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {expense.description}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                  R$ {expense.amount.toFixed(2)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {new Date(expense.date).toLocaleDateString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {expense.category}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-xl ${
-                    expense.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                  }`}>
+                <td className="px-4 py-3 text-sm">
+                  <span
+                    className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
+                      expense.status === 'paid'
+                        ? 'bg-green-500/10 text-green-400'
+                        : 'bg-yellow-500/10 text-yellow-400'
+                    }`}
+                  >
                     {expense.status === 'paid' ? 'Pago' : 'Pendente'}
                   </span>
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-300">
+                  {new Date(expense.date).toLocaleDateString()}
                 </td>
               </tr>
             ))}

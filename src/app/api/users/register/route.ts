@@ -28,7 +28,7 @@ export async function POST(request: Request) {
         { error: 'Este email já está cadastrado' },
         { status: 400 }
       )
-    }
+  }
 
     // Hash da senha
     const hashedPassword = await hash(password, 12)
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       
       // Cria o usuário
       const user = await tx.user.create({
-        data: {
+    data: {
           name,
           email,
           password: hashedPassword,

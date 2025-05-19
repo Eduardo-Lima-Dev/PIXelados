@@ -1,47 +1,62 @@
 import React from 'react'
 
-export default function Filters({ filters, setFilters, users, categories }: {
-  filters: any,
-  setFilters: (f: any) => void,
-  users: any[],
-  categories: string[],
-}) {
+interface FiltersProps {
+  filters: any;
+  setFilters: (filters: any) => void;
+  users: any[];
+  categories: string[];
+}
+
+export default function Filters({ filters, setFilters, users, categories }: FiltersProps) {
   return (
-    <div className="flex flex-wrap gap-3 mb-4">
-      <select
-        className="bg-gray-800 text-gray-200 px-3 py-2 rounded"
-        value={filters.category || ''}
-        onChange={e => setFilters((f: any) => ({ ...f, category: e.target.value }))}
-      >
-        <option value="">Todas categorias</option>
-        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-      </select>
-      <select
-        className="bg-gray-800 text-gray-200 px-3 py-2 rounded"
-        value={filters.status || ''}
-        onChange={e => setFilters((f: any) => ({ ...f, status: e.target.value }))}
-      >
-        <option value="">Todos status</option>
-        <option value="paid">Pagas</option>
-        <option value="pending">Pendentes</option>
-      </select>
-      <select
-        className="bg-gray-800 text-gray-200 px-3 py-2 rounded"
-        value={filters.userId || ''}
-        onChange={e => setFilters((f: any) => ({ ...f, userId: e.target.value }))}
-      >
-        <option value="">Todos usuários</option>
-        {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-      </select>
-      <select
-        className="bg-gray-800 text-gray-200 px-3 py-2 rounded"
-        value={filters.recurring || ''}
-        onChange={e => setFilters((f: any) => ({ ...f, recurring: e.target.value }))}
-      >
-        <option value="">Todas</option>
-        <option value="true">Recorrentes</option>
-        <option value="false">Não recorrentes</option>
-      </select>
+    <div className="mb-8 rounded-xl bg-[#1a2332] p-6 shadow-lg">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <select
+          value={filters.category || ''}
+          onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+          className="rounded-md border border-cyan-900 bg-transparent px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition shadow-sm hover:border-cyan-500"
+        >
+          <option value="">Todas as categorias</option>
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={filters.status || ''}
+          onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+          className="rounded-md border border-cyan-900 bg-transparent px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition shadow-sm hover:border-cyan-500"
+        >
+          <option value="">Todos os status</option>
+          <option value="pending">Pendente</option>
+          <option value="paid">Pago</option>
+        </select>
+
+        <select
+          value={filters.userId || ''}
+          onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+          className="rounded-md border border-cyan-900 bg-transparent px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition shadow-sm hover:border-cyan-500"
+        >
+          <option value="">Todos os membros</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={filters.recurring || ''}
+          onChange={(e) => setFilters({ ...filters, recurring: e.target.value })}
+          className="rounded-md border border-cyan-900 bg-transparent px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition shadow-sm hover:border-cyan-500"
+        >
+          <option value="">Todas as despesas</option>
+          <option value="true">Recorrentes</option>
+          <option value="false">Não recorrentes</option>
+        </select>
+      </div>
     </div>
-  )
+  );
 } 

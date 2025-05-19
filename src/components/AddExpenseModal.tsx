@@ -122,7 +122,7 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
             <input
               type="text"
               {...register('title')}
-              className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-900 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
               placeholder="Digite o título da despesa"
             />
             {errors.title && (
@@ -135,7 +135,7 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
             <input
               type="text"
               {...register('description')}
-              className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-900 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
               placeholder="Digite a descrição da despesa"
             />
             {errors.description && (
@@ -150,7 +150,7 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
               <input
                 type="text"
                 {...register('amount')}
-                className="pl-8 block w-full rounded-md border border-gray-700 bg-gray-900 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="pl-8 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
                 placeholder="0,00"
               />
             </div>
@@ -164,7 +164,7 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
             <input
               type="date"
               {...register('date')}
-              className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-900 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
             />
             {errors.date && (
               <p className="mt-1 text-sm text-red-400">{errors.date.message}</p>
@@ -175,7 +175,7 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
             <label className="block text-sm font-medium text-gray-300">Categoria</label>
             <select
               {...register('category')}
-              className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-900 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
             >
               <option value="">Selecione uma categoria</option>
               <option value="alimentacao">Alimentação</option>
@@ -193,51 +193,38 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
             <label className="block text-sm font-medium text-gray-300">Quem fez a despesa?</label>
             <select
               {...register('createdById')}
-              className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-900 text-white shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
             >
               <option value="">Selecione quem fez a despesa</option>
               {members && members.length > 0 ? (
                 members.map((member) => (
-                  <option key={member.id} value={member.id}>
-                    {member.name}
-                  </option>
+                  <option key={member.id} value={member.id}>{member.name}</option>
                 ))
-              ) : (
-                <option value="" disabled>Carregando membros...</option>
-              )}
+              ) : null}
             </select>
             {errors.createdById && (
               <p className="mt-1 text-sm text-red-400">{errors.createdById.message}</p>
             )}
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <input
               type="checkbox"
               {...register('recurring')}
-              className="h-4 w-4 rounded border-gray-700 bg-gray-900 text-blue-500 focus:ring-blue-500"
+              id="recurring"
+              className="rounded-xl border-cyan-900 bg-[#23243a]/70 text-cyan-500 focus:ring-cyan-400"
             />
-            <label className="ml-2 block text-sm text-gray-300">
-              Despesa recorrente
-            </label>
+            <label htmlFor="recurring" className="text-gray-300 text-sm">Despesa recorrente</label>
           </div>
 
-          <div className="flex justify-end gap-4 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-            >
-              {loading ? 'Criando...' : 'Criar Despesa'}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 px-5 py-2 text-lg font-semibold text-white shadow-lg transition hover:brightness-110 relative group mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 blur-md opacity-50 group-hover:opacity-75 transition-opacity"></span>
+            <span className="relative">{loading ? 'Adicionando...' : 'Adicionar Despesa'}</span>
+          </button>
         </form>
       </div>
     </div>

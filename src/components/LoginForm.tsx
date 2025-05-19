@@ -52,7 +52,7 @@ export default function LoginForm() {
         email: data.email,
         password: data.password,
         redirect: false,
-        callbackUrl
+        callbackUrl: '/dashboard'
       })
 
       console.log('Resultado do login:', result)
@@ -61,8 +61,11 @@ export default function LoginForm() {
         throw new Error(result.error)
       }
 
-      toast.success('Login realizado com sucesso!')
-      router.push(callbackUrl)
+      if (result?.ok) {
+        toast.success('Login realizado com sucesso!')
+        router.push('/dashboard')
+        router.refresh()
+      }
     } catch (error) {
       console.error('Erro no login:', error)
       toast.error('Erro ao fazer login. Verifique suas credenciais.')
