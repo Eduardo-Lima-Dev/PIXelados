@@ -173,7 +173,7 @@ export async function GET(request: Request) {
 // Criar nova despesa
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions)
     if (!session?.user?.email) {
       return NextResponse.json(
         { error: 'Você precisa estar autenticado' },
@@ -269,12 +269,12 @@ export async function POST(request: Request) {
 
     console.log('Dados da despesa:', expenseData)
 
-    const expense = await prisma.expense.create({
+  const expense = await prisma.expense.create({
       data: expenseData
     })
 
     console.log('Despesa criada com sucesso:', expense)
-    return NextResponse.json(expense)
+  return NextResponse.json(expense)
   } catch (error) {
     console.error('Erro detalhado ao criar despesa:', error)
     return NextResponse.json(
@@ -282,4 +282,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-} 
+}
