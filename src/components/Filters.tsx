@@ -21,7 +21,7 @@ export default function Filters({ filters, setFilters, users, categories }: Filt
 
   return (
     <div className="mb-6">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-4">
         <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <select
             value={filters.category || ''}
@@ -70,12 +70,14 @@ export default function Filters({ filters, setFilters, users, categories }: Filt
           </select>
         </div>
 
-        <button
-          onClick={clearFilters}
-          className="rounded-xl bg-gray-700/50 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700/70 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900 whitespace-nowrap"
-        >
-          Limpar Filtros
-        </button>
+        <div className="flex justify-end">
+          <button
+            onClick={clearFilters}
+            className="rounded-xl bg-gray-700/50 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700/70 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900 whitespace-nowrap"
+          >
+            Limpar Filtros
+          </button>
+        </div>
       </div>
     </div>
   );

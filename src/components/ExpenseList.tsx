@@ -14,10 +14,10 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
   }
 
   return (
-    <div className="rounded-xl bg-[#1a2332] p-6 shadow-lg">
+    <div className="rounded-xl bg-[#1a2332] p-4 lg:p-6 shadow-lg">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead>
+          <thead className="hidden lg:table-header-group">
             <tr className="border-b border-gray-700">
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Nome</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Descrição</th>
@@ -30,14 +30,25 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
           </thead>
           <tbody>
             {expenses.map((expense) => (
-              <tr key={expense.id} className="border-b border-gray-700/50">
-                <td className="px-4 py-3 text-sm text-white">{expense.title}</td>
-                <td className="px-4 py-3 text-sm text-white">{expense.description}</td>
-                <td className="px-4 py-3 text-sm text-gray-300">{expense.category}</td>
-                <td className="px-4 py-3 text-sm font-medium text-white">
+              <tr key={expense.id} className="border-b border-gray-700/50 lg:table-row flex flex-col">
+                <td className="px-4 py-3 text-sm text-white lg:table-cell block">
+                  <span className="lg:hidden font-medium text-gray-400 mr-2">Nome:</span>
+                  {expense.title}
+                </td>
+                <td className="px-4 py-3 text-sm text-white lg:table-cell block">
+                  <span className="lg:hidden font-medium text-gray-400 mr-2">Descrição:</span>
+                  {expense.description}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">
+                  <span className="lg:hidden font-medium text-gray-400 mr-2">Categoria:</span>
+                  {expense.category}
+                </td>
+                <td className="px-4 py-3 text-sm font-medium text-white lg:table-cell block">
+                  <span className="lg:hidden font-medium text-gray-400 mr-2">Valor:</span>
                   R$ {expense.amount.toFixed(2)}
                 </td>
-                <td className="px-4 py-3 text-sm">
+                <td className="px-4 py-3 text-sm lg:table-cell block">
+                  <span className="lg:hidden font-medium text-gray-400 mr-2">Status:</span>
                   <span
                     className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
                       expense.status === 'paid'
@@ -48,10 +59,12 @@ export default function ExpenseList({ expenses }: ExpenseListProps) {
                     {expense.status === 'paid' ? 'Pago' : 'Pendente'}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-300">
+                <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">
+                  <span className="lg:hidden font-medium text-gray-400 mr-2">Data:</span>
                   {new Date(expense.date).toLocaleDateString()}
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-300">
+                <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">
+                  <span className="lg:hidden font-medium text-gray-400 mr-2">Criado por:</span>
                   {expense.createdBy?.name || 'N/A'}
                 </td>
               </tr>

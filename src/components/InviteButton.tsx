@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
+import { FaLink } from 'react-icons/fa'
 
 export default function InviteButton({ houseId }: { houseId: number }) {
   const [inviteLink, setInviteLink] = useState<string | null>(null)
@@ -32,9 +33,13 @@ export default function InviteButton({ houseId }: { houseId: number }) {
       <button
         onClick={handleInvite}
         disabled={loading}
-        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-semibold shadow"
+        className="rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 px-5 py-2 text-sm font-medium text-white shadow-lg transition hover:brightness-110 relative group w-full sm:w-auto"
       >
-        {loading ? 'Gerando...' : 'Gerar link de convite'}
+        <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 blur-md opacity-50 group-hover:opacity-75 transition-opacity"></span>
+        <span className="relative flex items-center justify-center gap-2">
+          <FaLink className="w-4 h-4" />
+          {loading ? 'Gerando...' : 'Gerar Link de Convite'}
+        </span>
       </button>
       {inviteLink && (
         <div className="flex items-center gap-2 mt-1">

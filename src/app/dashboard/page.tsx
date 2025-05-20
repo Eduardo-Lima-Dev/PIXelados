@@ -108,39 +108,41 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-[#0c0c1f] via-[#0d102b] to-[#10141e]">
       <Sidebar />
-      <main className="flex-1 p-8">
-        <div className="flex justify-between items-center mb-6">
+      <main className="flex-1 p-4 lg:p-8 mt-16 lg:mt-0">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
           <h1 className="text-2xl font-bold text-white">
             <span className="bg-gradient-to-r from-cyan-400 to-indigo-500 bg-clip-text text-transparent">
               Despesas da Casa
             </span>
           </h1>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
             {houseId && <InviteButton houseId={houseId} />}
             <button
               onClick={() => setIsModalOpen(true)}
-              className="rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 px-5 py-2 text-sm font-medium text-white shadow-lg transition hover:brightness-110 relative group"
+              className="rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 px-5 py-2 text-sm font-medium text-white shadow-lg transition hover:brightness-110 relative group w-full sm:w-auto"
             >
               <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 blur-md opacity-50 group-hover:opacity-75 transition-opacity"></span>
               <span className="relative">Nova Despesa</span>
             </button>
           </div>
         </div>
-        <TotalsCard users={users} expenses={filteredExpenses} />
-        <Filters filters={filters} setFilters={setFilters} users={users} categories={categories} />
-        {/* Navegação de mês */}
-        <div className="flex items-center justify-center gap-4 mb-4">
-          <button onClick={goToPrevMonth} className="p-2 rounded-full hover:bg-cyan-900/30 transition">
-            <ChevronLeft className="w-5 h-5 text-cyan-400" />
-          </button>
-          <span className="text-lg font-semibold text-white">
-            {monthNames[currentMonth.month]} {currentMonth.year}
-          </span>
-          <button onClick={goToNextMonth} className="p-2 rounded-full hover:bg-cyan-900/30 transition">
-            <ChevronRight className="w-5 h-5 text-cyan-400" />
-          </button>
+        <div className="space-y-6">
+          <TotalsCard users={users} expenses={filteredExpenses} />
+          <Filters filters={filters} setFilters={setFilters} users={users} categories={categories} />
+          {/* Navegação de mês */}
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <button onClick={goToPrevMonth} className="p-2 rounded-full hover:bg-cyan-900/30 transition">
+              <ChevronLeft className="w-5 h-5 text-cyan-400" />
+            </button>
+            <span className="text-lg font-semibold text-white">
+              {monthNames[currentMonth.month]} {currentMonth.year}
+            </span>
+            <button onClick={goToNextMonth} className="p-2 rounded-full hover:bg-cyan-900/30 transition">
+              <ChevronRight className="w-5 h-5 text-cyan-400" />
+            </button>
+          </div>
+          <ExpenseList expenses={filteredExpenses} />
         </div>
-        <ExpenseList expenses={filteredExpenses} />
       </main>
       <AddExpenseModal
         isOpen={isModalOpen}
