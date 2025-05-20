@@ -49,8 +49,8 @@ export async function POST(request: Request) {
     })
 
     // Gera a URL base usando a URL do ambiente
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}`
+    const baseUrl = process.env.NODE_ENV === 'production'
+      ? 'https://pixelados.vercel.app'
       : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
     
     const inviteLink = `${baseUrl}/join/${code}`
