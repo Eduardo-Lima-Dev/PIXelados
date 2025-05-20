@@ -10,6 +10,8 @@ import TotalsCard from '@/components/TotalsCard'
 import Filters from '@/components/Filters'
 import AddExpenseModal from '@/components/AddExpenseModal'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { toast } from 'react-hot-toast'
+import ConfirmDeleteModal from '@/components/ConfirmDeleteModal'
 
 const monthNames = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -31,6 +33,9 @@ export default function DashboardPage() {
     const now = new Date()
     return { month: now.getMonth(), year: now.getFullYear() }
   })
+  const [editingExpense, setEditingExpense] = useState<any | null>(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [expenseToDelete, setExpenseToDelete] = useState<any | null>(null)
 
   const loadAllExpenses = async () => {
     if (!houseId) return
@@ -132,6 +137,37 @@ export default function DashboardPage() {
     );
   });
 
+  // Para abrir em modo edição:
+  const handleEdit = (expense: any) => {
+    setEditingExpense(expense);
+    setIsModalOpen(true);
+  };
+
+  // Para abrir em modo adicionar:
+  const handleAdd = () => {
+    setEditingExpense(null);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (expense: any) => {
+    setExpenseToDelete(expense);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!expenseToDelete) return;
+    try {
+      await fetch(`/api/expenses/${expenseToDelete.id}`, { method: 'DELETE' });
+      setDeleteModalOpen(false);
+      setExpenseToDelete(null);
+      loadAllExpenses();
+      loadFilteredExpenses();
+      toast.success('Despesa excluída com sucesso!');
+    } catch (err) {
+      toast.error('Erro ao excluir despesa');
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-[#0c0c1f] via-[#0d102b] to-[#10141e]">
       <Sidebar />
@@ -145,7 +181,7 @@ export default function DashboardPage() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
             {houseId && <InviteButton houseId={houseId} />}
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={handleAdd}
               className="rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 px-5 py-2 text-sm font-medium text-white shadow-lg transition hover:brightness-110 relative group w-full sm:w-auto"
             >
               <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 blur-md opacity-50 group-hover:opacity-75 transition-opacity"></span>
@@ -175,6 +211,8 @@ export default function DashboardPage() {
               loadFilteredExpenses();
             }}
             currentMonth={currentMonth}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
           />
         </div>
       </main>
@@ -183,9 +221,16 @@ export default function DashboardPage() {
         onClose={() => setIsModalOpen(false)}
         houseId={houseId || 0}
         onExpenseCreated={() => {
-          loadAllExpenses()
-          loadFilteredExpenses()
+          loadAllExpenses();
+          loadFilteredExpenses();
         }}
+        editingExpense={editingExpense}
+        mode={editingExpense ? 'edit' : 'add'}
+      />
+      <ConfirmDeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
       />
     </div>
   )

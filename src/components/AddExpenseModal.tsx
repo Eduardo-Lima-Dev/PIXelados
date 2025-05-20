@@ -25,9 +25,11 @@ interface AddExpenseModalProps {
   onClose: () => void
   houseId: number
   onExpenseCreated: () => void
+  editingExpense?: any
+  mode?: 'add' | 'edit'
 }
 
-export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCreated }: AddExpenseModalProps) {
+export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCreated, editingExpense, mode }: AddExpenseModalProps) {
   const [loading, setLoading] = useState(false)
   const [members, setMembers] = useState<any[]>([])
   const { register, handleSubmit, reset, formState: { errors } } = useForm<ExpenseFormData>({
@@ -66,19 +68,49 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
     }
   }, [isOpen, houseId])
 
+  useEffect(() => {
+    if (editingExpense) {
+      reset({
+        title: editingExpense.title,
+        description: editingExpense.description,
+        amount: editingExpense.amount,
+        date: editingExpense.date.split('T')[0],
+        category: editingExpense.category,
+        recurring: editingExpense.recurring,
+        createdById: String(editingExpense.createdById),
+      });
+    } else {
+      reset(); // limpa o formulário para novo
+    }
+  }, [editingExpense, reset]);
+
   const onSubmit = async (data: ExpenseFormData) => {
     setLoading(true)
     try {
-      console.log('Dados do formulário:', data)
-      const response = await fetch('/api/expenses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          amount: Number(data.amount),
-          houseId,
-        }),
-      })
+      let response;
+      if (mode === 'edit' && editingExpense) {
+        // PATCH para /api/expenses/:id
+        response = await fetch(`/api/expenses/${editingExpense.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...data,
+            amount: Number(data.amount),
+            houseId,
+          }),
+        })
+      } else {
+        // POST normal
+        response = await fetch('/api/expenses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...data,
+            amount: Number(data.amount),
+            houseId,
+          }),
+        })
+      }
 
       const responseData = await response.json()
       console.log('Resposta da API:', responseData)
@@ -105,7 +137,9 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-[#1a2332] p-6 rounded-xl shadow-2xl max-w-md w-full">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-white">Nova Despesa</h2>
+          <h2 className="text-xl font-bold text-white">
+            {mode === 'edit' ? 'Editar Despesa' : 'Nova Despesa'}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white"

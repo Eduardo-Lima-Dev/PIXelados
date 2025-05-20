@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
 import StatusSelect from './StatusSelect'
+import { FaEdit, FaTrash } from 'react-icons/fa'
 
 interface ExpenseListProps {
   expenses: any[]
   onExpenseUpdated: () => void
   currentMonth: { month: number; year: number }
+  onEdit: (expense: any) => void
+  onDelete: (expense: any) => void
 }
 
-export default function ExpenseList({ expenses, onExpenseUpdated, currentMonth }: ExpenseListProps) {
+export default function ExpenseList({ expenses, onExpenseUpdated, currentMonth, onEdit, onDelete }: ExpenseListProps) {
   const [editingStatus, setEditingStatus] = useState<number | null>(null)
 
   const handleStatusChange = async (expenseId: number, newStatus: string) => {
@@ -54,6 +57,7 @@ export default function ExpenseList({ expenses, onExpenseUpdated, currentMonth }
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Status</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Data</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Criado por</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -93,6 +97,16 @@ export default function ExpenseList({ expenses, onExpenseUpdated, currentMonth }
                 <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">
                   <span className="lg:hidden font-medium text-gray-400 mr-2">Criado por:</span>
                   {expense.createdBy?.name || 'N/A'}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">
+                  <div className="flex gap-3">
+                    <button onClick={() => onEdit(expense)} className="text-cyan-400 hover:text-cyan-300">
+                      <FaEdit />
+                    </button>
+                    <button onClick={() => onDelete(expense)} className="text-red-400 hover:text-red-300">
+                      <FaTrash />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
