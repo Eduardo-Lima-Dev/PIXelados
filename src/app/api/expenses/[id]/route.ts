@@ -44,22 +44,26 @@ export async function PATCH(
       )
     }
 
+    // Prepara os dados para atualização
+    const updateData: any = {}
+
+    // Adiciona apenas os campos que foram enviados
+    if (title !== undefined) updateData.title = title
+    if (description !== undefined) updateData.description = description
+    if (amount !== undefined) updateData.amount = Number(amount)
+    if (date !== undefined) updateData.date = new Date(date)
+    if (category !== undefined) updateData.category = category
+    if (recurring !== undefined) updateData.recurring = recurring
+    if (createdById !== undefined) updateData.createdById = Number(createdById)
+    if (houseId !== undefined) updateData.houseId = Number(houseId)
+    if (status !== undefined) updateData.status = status
+
     // Atualiza a despesa
     const expense = await prisma.expense.update({
       where: {
         id: Number(params.id)
       },
-      data: {
-        title,
-        description,
-        amount: Number(amount),
-        date: new Date(date),
-        category,
-        recurring,
-        createdById: Number(createdById),
-        houseId: Number(houseId),
-        status: status || 'pending'
-      },
+      data: updateData,
       include: {
         createdBy: true
       }
