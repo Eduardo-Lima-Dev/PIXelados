@@ -4,9 +4,10 @@ import StatusSelect from './StatusSelect'
 interface ExpenseListProps {
   expenses: any[]
   onExpenseUpdated: () => void
+  currentMonth: { month: number; year: number }
 }
 
-export default function ExpenseList({ expenses, onExpenseUpdated }: ExpenseListProps) {
+export default function ExpenseList({ expenses, onExpenseUpdated, currentMonth }: ExpenseListProps) {
   const [editingStatus, setEditingStatus] = useState<number | null>(null)
 
   const handleStatusChange = async (expenseId: number, newStatus: string) => {
@@ -79,6 +80,10 @@ export default function ExpenseList({ expenses, onExpenseUpdated }: ExpenseListP
                   <StatusSelect
                     value={expense.status}
                     onChange={(newStatus) => handleStatusChange(expense.id, newStatus)}
+                    disabled={expense.recurring && (
+                      new Date(expense.date).getMonth() !== currentMonth.month ||
+                      new Date(expense.date).getFullYear() !== currentMonth.year
+                    )}
                   />
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">

@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 interface StatusSelectProps {
   value: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }
 
 const options = [
@@ -11,7 +12,7 @@ const options = [
   { value: 'pending', label: 'Pendente', color: 'text-yellow-400', bg: 'hover:bg-yellow-500/10' },
 ];
 
-export default function StatusSelect({ value, onChange }: StatusSelectProps) {
+export default function StatusSelect({ value, onChange, disabled }: StatusSelectProps) {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0, showAbove: false });
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -49,9 +50,12 @@ export default function StatusSelect({ value, onChange }: StatusSelectProps) {
       <button
         ref={buttonRef}
         type="button"
+        disabled={disabled}
         className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition 
-          ${value === 'paid' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}`}
-        onClick={() => setOpen(o => !o)}
+          ${value === 'paid' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}
+          ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+        `}
+        onClick={() => !disabled && setOpen(o => !o)}
       >
         {selected?.label}
         <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,7 +63,7 @@ export default function StatusSelect({ value, onChange }: StatusSelectProps) {
         </svg>
       </button>
 
-      {open && createPortal(
+      {open && !disabled && createPortal(
         <div
           className="fixed bg-[#23243a] border border-gray-700 shadow-lg rounded-xl z-[9999]"
           style={{

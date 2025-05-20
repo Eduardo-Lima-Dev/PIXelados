@@ -114,6 +114,24 @@ export default function DashboardPage() {
     })
   }
 
+  // Filtra as despesas do mês/ano selecionado
+  const monthFilteredExpenses = filteredExpenses.filter((expense) => {
+    const date = new Date(expense.date);
+    // Se não for recorrente, só aparece no mês/ano exato
+    if (!expense.recurring) {
+      return (
+        date.getMonth() === currentMonth.month &&
+        date.getFullYear() === currentMonth.year
+      );
+    }
+    // Se for recorrente, aparece em todos os meses/anos a partir da data original,
+    // mas só permite editar o status no mês/ano original
+    return (
+      (date.getFullYear() < currentMonth.year) ||
+      (date.getFullYear() === currentMonth.year && date.getMonth() <= currentMonth.month)
+    );
+  });
+
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-[#0c0c1f] via-[#0d102b] to-[#10141e]">
       <Sidebar />
@@ -150,10 +168,14 @@ export default function DashboardPage() {
               <ChevronRight className="w-5 h-5 text-cyan-400" />
             </button>
           </div>
-          <ExpenseList expenses={filteredExpenses} onExpenseUpdated={() => {
-            loadAllExpenses()
-            loadFilteredExpenses()
-          }} />
+          <ExpenseList
+            expenses={monthFilteredExpenses}
+            onExpenseUpdated={() => {
+              loadAllExpenses();
+              loadFilteredExpenses();
+            }}
+            currentMonth={currentMonth}
+          />
         </div>
       </main>
       <AddExpenseModal
