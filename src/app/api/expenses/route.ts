@@ -134,6 +134,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const houseId = searchParams.get('houseId')
     const userId = searchParams.get('userId')
+    const category = searchParams.get('category')
+    const status = searchParams.get('status')
+    const recurring = searchParams.get('recurring')
 
     if (!houseId) {
       return NextResponse.json({ error: 'houseId é obrigatório' }, { status: 400 })
@@ -144,11 +147,19 @@ export async function GET(request: Request) {
     }
 
     if (userId) {
-      where.participants = {
-        some: {
-          userId: Number(userId)
-        }
-      }
+      where.createdById = Number(userId)
+    }
+
+    if (category) {
+      where.category = category
+    }
+
+    if (status) {
+      where.status = status
+    }
+
+    if (recurring !== null) {
+      where.recurring = recurring === 'true'
     }
 
     const expenses = await prisma.expense.findMany({

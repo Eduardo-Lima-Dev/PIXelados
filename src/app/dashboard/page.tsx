@@ -19,7 +19,8 @@ const monthNames = [
 export default function DashboardPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [expenses, setExpenses] = useState<any[]>([])
+  const [allExpenses, setAllExpenses] = useState<any[]>([])
+  const [filteredExpenses, setFilteredExpenses] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
   const [filters, setFilters] = useState<any>({})
   const [houseId, setHouseId] = useState<number | null>(null)
@@ -31,7 +32,22 @@ export default function DashboardPage() {
     return { month: now.getMonth(), year: now.getFullYear() }
   })
 
-  const loadExpenses = async () => {
+  const loadAllExpenses = async () => {
+    if (!houseId) return
+
+    try {
+      const res = await fetch(`/api/expenses?houseId=${houseId}`)
+      const data = await res.json()
+      if (Array.isArray(data)) {
+        setAllExpenses(data)
+        setCategories([...new Set(data.map(e => e.category).filter(Boolean))])
+      }
+    } catch (err) {
+      console.error('Erro ao buscar despesas:', err)
+    }
+  }
+
+  const loadFilteredExpenses = async () => {
     if (!houseId) return
 
     const params = new URLSearchParams({ houseId: String(houseId) })
@@ -44,12 +60,10 @@ export default function DashboardPage() {
       const res = await fetch(`/api/expenses?${params.toString()}`)
       const data = await res.json()
       if (Array.isArray(data)) {
-        setExpenses(data)
-        // Extrai categorias únicas
-        setCategories([...new Set(data.map(e => e.category).filter(Boolean))])
+        setFilteredExpenses(data)
       }
     } catch (err) {
-      console.error('Erro ao buscar despesas:', err)
+      console.error('Erro ao buscar despesas filtradas:', err)
     }
   }
 
@@ -75,17 +89,12 @@ export default function DashboardPage() {
   }, [status])
 
   useEffect(() => {
-    loadExpenses()
-  }, [houseId, filters])
+    loadAllExpenses()
+  }, [houseId])
 
-  // Filtra despesas do mês selecionado
-  const filteredExpenses = expenses.filter((expense) => {
-    if (filters.category && expense.category !== filters.category) return false
-    if (filters.userId && expense.createdBy?.id !== filters.userId) return false
-    if (filters.status && expense.status !== filters.status) return false
-    if (filters.recurring !== '' && expense.recurring !== (filters.recurring === 'true')) return false
-    return true
-  })
+  useEffect(() => {
+    loadFilteredExpenses()
+  }, [houseId, filters])
 
   // Funções para navegar entre meses
   const goToPrevMonth = () => {
@@ -127,7 +136,7 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="space-y-6">
-          <TotalsCard users={users} expenses={filteredExpenses} />
+          <TotalsCard users={users} expenses={allExpenses} />
           <Filters filters={filters} setFilters={setFilters} users={users} categories={categories} />
           {/* Navegação de mês */}
           <div className="flex items-center justify-center gap-4 mb-4">
@@ -141,14 +150,20 @@ export default function DashboardPage() {
               <ChevronRight className="w-5 h-5 text-cyan-400" />
             </button>
           </div>
-          <ExpenseList expenses={filteredExpenses} />
+          <ExpenseList expenses={filteredExpenses} onExpenseUpdated={() => {
+            loadAllExpenses()
+            loadFilteredExpenses()
+          }} />
         </div>
       </main>
       <AddExpenseModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         houseId={houseId || 0}
-        onExpenseCreated={loadExpenses}
+        onExpenseCreated={() => {
+          loadAllExpenses()
+          loadFilteredExpenses()
+        }}
       />
     </div>
   )
