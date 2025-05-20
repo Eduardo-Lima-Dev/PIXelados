@@ -23,28 +23,33 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Senha", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email e senha são obrigatórios')
-        }
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error('Email e senha são obrigatórios')
+          }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
-        })
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email }
+          })
 
-        if (!user) {
-          throw new Error('Usuário não encontrado')
-        }
+          if (!user) {
+            throw new Error('Usuário não encontrado')
+          }
 
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
+          const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
 
-        if (!isPasswordValid) {
-          throw new Error('Senha incorreta')
-        }
+          if (!isPasswordValid) {
+            throw new Error('Senha incorreta')
+          }
 
-        return {
-          id: String(user.id),
-          name: user.name,
-          email: user.email
+          return {
+            id: String(user.id),
+            name: user.name,
+            email: user.email
+          }
+        } catch (error) {
+          console.error('Erro na autenticação:', error)
+          throw error
         }
       }
     })
@@ -55,45 +60,60 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     jwt: async ({ token, user }) => {
-      if (user) {
-        token.id = user.id
-        token.email = user.email
-        token.name = user.name
+      try {
+        if (user) {
+          token.id = user.id
+          token.email = user.email
+          token.name = user.name
+        }
+        return token
+      } catch (error) {
+        console.error('Erro no callback JWT:', error)
+        return token
       }
-      return token
     },
     session: async ({ session, token }) => {
-      if (session?.user) {
-        session.user.id = token.id as string
-        session.user.email = token.email as string
-        session.user.name = token.name as string
+      try {
+        if (session?.user) {
+          session.user.id = token.id as string
+          session.user.email = token.email as string
+          session.user.name = token.name as string
+        }
+        return session
+      } catch (error) {
+        console.error('Erro no callback Session:', error)
+        return session
       }
-      return session
     },
     signIn: async ({ user }) => {
-      if (user.id) {
-        // Verifica se o usuário já tem uma casa
-        const userWithHouses = await prisma.user.findUnique({
-          where: { id: Number(user.id) },
-          include: {
-            houses: true,
-            ownedHouses: true
-          }
-        })
-
-        // Se não tiver casa, cria uma
-        if (userWithHouses && userWithHouses.ownedHouses.length === 0) {
-          await prisma.house.create({
-            data: {
-              ownerId: Number(user.id),
-              members: {
-                connect: { id: Number(user.id) }
-              }
+      try {
+        if (user.id) {
+          // Verifica se o usuário já tem uma casa
+          const userWithHouses = await prisma.user.findUnique({
+            where: { id: Number(user.id) },
+            include: {
+              houses: true,
+              ownedHouses: true
             }
           })
+
+          // Se não tiver casa, cria uma
+          if (userWithHouses && userWithHouses.ownedHouses.length === 0) {
+            await prisma.house.create({
+              data: {
+                ownerId: Number(user.id),
+                members: {
+                  connect: { id: Number(user.id) }
+                }
+              }
+            })
+          }
         }
+        return true
+      } catch (error) {
+        console.error('Erro no callback SignIn:', error)
+        return false
       }
-      return true
     }
   },
   pages: {
@@ -101,5 +121,16 @@ export const authOptions: NextAuthOptions = {
     error: '/api/auth/error'
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === 'development'
+  debug: process.env.NODE_ENV === 'development',
+  logger: {
+    error(code, metadata) {
+      console.error('Erro NextAuth:', code, metadata)
+    },
+    warn(code) {
+      console.warn('Aviso NextAuth:', code)
+    },
+    debug(code, metadata) {
+      console.debug('Debug NextAuth:', code, metadata)
+    }
+  }
 } 
