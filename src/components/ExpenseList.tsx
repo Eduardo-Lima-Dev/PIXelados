@@ -65,11 +65,11 @@ export default function ExpenseList({ expenses, onExpenseUpdated, currentMonth, 
             <tr className="border-b border-gray-700">
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Nome</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Descrição</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Criado por</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Categoria</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Valor</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Status</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Data</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Criado por</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Ações</th>
             </tr>
           </thead>
@@ -83,6 +83,10 @@ export default function ExpenseList({ expenses, onExpenseUpdated, currentMonth, 
                 <td className="px-4 py-3 text-sm text-white lg:table-cell block">
                   <span className="lg:hidden font-medium text-gray-400 mr-2">Descrição:</span>
                   {expense.description}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">
+                  <span className="lg:hidden font-medium text-gray-400 mr-2">Criado por:</span>
+                  {expense.createdBy?.name || 'N/A'}
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">
                   <span className="lg:hidden font-medium text-gray-400 mr-2">Categoria:</span>
@@ -109,10 +113,6 @@ export default function ExpenseList({ expenses, onExpenseUpdated, currentMonth, 
                 <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">
                   <span className="lg:hidden font-medium text-gray-400 mr-2">Data:</span>
                   {new Date(expense.date).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">
-                  <span className="lg:hidden font-medium text-gray-400 mr-2">Criado por:</span>
-                  {expense.createdBy?.name || 'N/A'}
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">
                   <span className="lg:hidden font-medium text-gray-400 mr-2">Ações:</span>
