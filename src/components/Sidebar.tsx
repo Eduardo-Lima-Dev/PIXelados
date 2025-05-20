@@ -26,8 +26,10 @@ export default function Sidebar() {
 
       <aside
         className={`fixed lg:relative h-screen bg-[#23243a] shadow-xl flex flex-col items-center py-6 transition-all duration-300 z-40
-          ${isMobileMenuOpen ? 'w-56' : 'w-16 lg:w-16'}
-          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+          ${isMobileMenuOpen ? 'w-56 translate-x-0' : '-translate-x-full w-56'}
+          ${!isMobileMenuOpen ? (expanded ? 'lg:w-56' : 'lg:w-16') : ''}
+          lg:translate-x-0
+        `}
         onMouseEnter={() => !isMobileMenuOpen && setExpanded(true)}
         onMouseLeave={() => !isMobileMenuOpen && setExpanded(false)}
       >

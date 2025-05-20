@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import StatusSelect from './StatusSelect'
 
 interface ExpenseListProps {
   expenses: any[]
@@ -75,34 +76,10 @@ export default function ExpenseList({ expenses, onExpenseUpdated }: ExpenseListP
                 </td>
                 <td className="px-4 py-3 text-sm lg:table-cell block relative">
                   <span className="lg:hidden font-medium text-gray-400 mr-2">Status:</span>
-                  <div className="relative">
-                    <button
-                      onClick={() => setEditingStatus(editingStatus === expense.id ? null : expense.id)}
-                      className={`inline-flex rounded-full px-2 py-1 text-xs font-medium cursor-pointer ${
-                        expense.status === 'paid'
-                          ? 'bg-green-500/10 text-green-400'
-                          : 'bg-yellow-500/10 text-yellow-400'
-                      }`}
-                    >
-                      {expense.status === 'paid' ? 'Pago' : 'Pendente'}
-                    </button>
-                    {editingStatus === expense.id && (
-                      <div className="absolute left-0 mt-1 w-32 rounded-lg bg-[#23243a] border border-gray-700 shadow-lg z-10">
-                        <button
-                          onClick={() => handleStatusChange(expense.id, 'paid')}
-                          className="w-full text-left px-3 py-2 text-sm text-green-400 hover:bg-gray-700/50 rounded-t-lg"
-                        >
-                          Pago
-                        </button>
-                        <button
-                          onClick={() => handleStatusChange(expense.id, 'pending')}
-                          className="w-full text-left px-3 py-2 text-sm text-yellow-400 hover:bg-gray-700/50 rounded-b-lg"
-                        >
-                          Pendente
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <StatusSelect
+                    value={expense.status}
+                    onChange={(newStatus) => handleStatusChange(expense.id, newStatus)}
+                  />
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">
                   <span className="lg:hidden font-medium text-gray-400 mr-2">Data:</span>
