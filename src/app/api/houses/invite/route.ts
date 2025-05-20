@@ -48,8 +48,11 @@ export async function POST(request: Request) {
       data: { inviteCode: code },
     })
 
-    // Gera a URL base
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    // Gera a URL base usando a URL do ambiente
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    
     const inviteLink = `${baseUrl}/join/${code}`
 
     return NextResponse.json({ 
