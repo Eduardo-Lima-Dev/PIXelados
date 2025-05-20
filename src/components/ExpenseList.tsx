@@ -115,11 +115,18 @@ export default function ExpenseList({ expenses, onExpenseUpdated, currentMonth, 
                   {expense.createdBy?.name || 'N/A'}
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-300 lg:table-cell block">
-                  <div className="flex gap-3">
-                    <button onClick={() => onEdit(expense)} className="text-cyan-400 hover:text-cyan-300">
+                  <span className="lg:hidden font-medium text-gray-400 mr-2">Ações:</span>
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={() => onEdit(expense)} 
+                      className="text-cyan-400 hover:text-cyan-300 transition-colors text-lg"
+                    >
                       <FaEdit />
                     </button>
-                    <button onClick={() => onDelete(expense)} className="text-red-400 hover:text-red-300">
+                    <button 
+                      onClick={() => onDelete(expense)} 
+                      className="text-red-400 hover:text-red-300 transition-colors text-lg"
+                    >
                       <FaTrash />
                     </button>
                   </div>
