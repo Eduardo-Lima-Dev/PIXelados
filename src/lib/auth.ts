@@ -54,11 +54,7 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 dias
   },
   callbacks: {
-    jwt: async ({ token, user, account }) => {
-      console.log('JWT Callback - Token:', token)
-      console.log('JWT Callback - User:', user)
-      console.log('JWT Callback - Account:', account)
-      
+    jwt: async ({ token, user }) => {
       if (user) {
         token.id = user.id
         token.email = user.email
@@ -67,9 +63,6 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     session: async ({ session, token }) => {
-      console.log('Session Callback - Session:', session)
-      console.log('Session Callback - Token:', token)
-      
       if (session?.user) {
         session.user.id = token.id as string
         session.user.email = token.email as string
@@ -105,7 +98,8 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/login',
+    error: '/api/auth/error'
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true
+  debug: process.env.NODE_ENV === 'development'
 } 
