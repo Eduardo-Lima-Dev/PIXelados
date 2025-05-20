@@ -130,6 +130,7 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
         createdById: Number(data.createdById),
         houseId,
         status: data.status || editingExpense?.status,
+        recurrenceId: editingExpense?.recurrenceId || (data.recurring ? undefined : null)
       };
 
       console.log('Dados sendo enviados:', expenseData);

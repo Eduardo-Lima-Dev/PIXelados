@@ -8,6 +8,7 @@ export interface ExpenseData {
   createdById: number;
   houseId: number;
   status?: string;
+  recurrenceId?: string | null;
 }
 
 export async function updateExpense(id: number, data: ExpenseData) {

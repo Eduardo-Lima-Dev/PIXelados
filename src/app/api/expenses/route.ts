@@ -4,6 +4,11 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { Prisma } from '@prisma/client'
 
+// Função para gerar um ID único
+function generateUniqueId() {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36)
+}
+
 // Listar despesas (com filtros)
 export async function GET(request: Request) {
   try {
@@ -60,7 +65,8 @@ export async function GET(request: Request) {
 // Criar nova despesa
 export async function POST(request: Request) {
   try {
-  const session = await getServerSession(authOptions)
+    console.log('Iniciando criação de despesa...')
+    const session = await getServerSession(authOptions)
     if (!session?.user?.email) {
       return NextResponse.json(
         { error: 'Você precisa estar autenticado' },
@@ -91,6 +97,7 @@ export async function POST(request: Request) {
     }
 
     // Busca o usuário
+    console.log('Buscando usuário...')
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }
     })
@@ -104,6 +111,7 @@ export async function POST(request: Request) {
     }
 
     // Verifica se o usuário é membro da casa
+    console.log('Verificando se usuário é membro da casa...')
     const house = await prisma.house.findFirst({
       where: {
         id: houseId,
@@ -123,47 +131,81 @@ export async function POST(request: Request) {
       )
     }
 
+    // Converte o valor para Float
+    const amountFloat = parseFloat(amount)
+
+    // Gera um recurrenceId se for uma despesa recorrente
+    const recurrenceId = recurring ? generateUniqueId() : null
+
     console.log('Criando despesa com dados:', {
       title,
       description,
-      amount: Number(amount),
+      amount: amountFloat,
       date: new Date(date),
       category,
       recurring,
+      recurrenceId,
       houseId,
       createdById: Number(createdById)
     })
 
-    // Cria a despesa
-    const expenseData = {
-      title,
-      description,
-      amount: Number(amount),
-      date: new Date(date),
-      category,
-      recurring: recurring || false,
-      houseId,
-      createdById: Number(createdById),
-      status: 'pending',
-      participants: {
-        create: {
-          userId: Number(createdById),
-          amount: Number(amount),
-          paid: true
+    try {
+      // Cria a despesa
+      const expenseData: Prisma.ExpenseCreateInput = {
+        title,
+        description,
+        amount: amountFloat,
+        date: new Date(date),
+        category,
+        recurring: recurring || false,
+        house: {
+          connect: {
+            id: houseId
+          }
+        },
+        createdBy: {
+          connect: {
+            id: Number(createdById)
+          }
+        },
+        status: 'pending',
+        participants: {
+          create: {
+            userId: Number(createdById),
+            amount: amountFloat,
+            paid: true
+          }
         }
       }
+
+      console.log('Dados da despesa:', expenseData)
+
+      const expense = await prisma.expense.create({
+        data: expenseData
+      })
+
+      console.log('Despesa criada com sucesso:', expense)
+      return NextResponse.json(expense)
+    } catch (dbError) {
+      console.error('Erro ao criar despesa no banco:', dbError)
+      if (dbError instanceof Prisma.PrismaClientKnownRequestError) {
+        console.error('Código do erro Prisma:', dbError.code)
+        console.error('Mensagem do erro Prisma:', dbError.message)
+        return NextResponse.json(
+          { error: 'Erro ao criar despesa', code: dbError.code, message: dbError.message },
+          { status: 500 }
+        )
+      }
+      throw dbError
     }
-
-    console.log('Dados da despesa:', expenseData)
-
-  const expense = await prisma.expense.create({
-      data: expenseData
-    })
-
-    console.log('Despesa criada com sucesso:', expense)
-  return NextResponse.json(expense)
   } catch (error) {
     console.error('Erro detalhado ao criar despesa:', error)
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json(
+        { error: 'Erro ao criar despesa', code: error.code, message: error.message },
+        { status: 500 }
+      )
+    }
     return NextResponse.json(
       { error: 'Erro ao criar despesa', details: error instanceof Error ? error.message : 'Erro desconhecido' },
       { status: 500 }
