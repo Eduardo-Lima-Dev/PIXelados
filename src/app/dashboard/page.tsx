@@ -101,6 +101,21 @@ export default function DashboardPage() {
     loadFilteredExpenses()
   }, [houseId, filters])
 
+  // Adicione este useEffect para polling
+  useEffect(() => {
+    // Função para recarregar os dados
+    const reloadData = async () => {
+      await loadAllExpenses();
+      await loadFilteredExpenses();
+    };
+
+    // Recarrega a cada 5 segundos
+    const interval = setInterval(reloadData, 5000);
+
+    // Limpa o intervalo quando o componente for desmontado
+    return () => clearInterval(interval);
+  }, []); // Array vazio significa que só executa na montagem do componente
+
   // Funções para navegar entre meses
   const goToPrevMonth = () => {
     setCurrentMonth(prev => {
@@ -207,6 +222,7 @@ export default function DashboardPage() {
           <ExpenseList
             expenses={monthFilteredExpenses}
             onExpenseUpdated={() => {
+              console.log('DashboardPage - Atualizando despesas após mudança de status');
               loadAllExpenses();
               loadFilteredExpenses();
             }}

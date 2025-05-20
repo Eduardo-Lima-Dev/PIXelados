@@ -19,6 +19,8 @@ export async function PATCH(
     const body = await request.json()
     const { status } = body
 
+    console.log('PATCH /api/expenses/[id] - Dados recebidos:', { id: params.id, status })
+
     if (!status) {
       return NextResponse.json(
         { error: 'Status é obrigatório' },
@@ -52,8 +54,13 @@ export async function PATCH(
       },
       data: {
         status
+      },
+      include: {
+        createdBy: true
       }
     })
+
+    console.log('PATCH /api/expenses/[id] - Despesa atualizada:', expense)
 
     return NextResponse.json(expense)
   } catch (error) {

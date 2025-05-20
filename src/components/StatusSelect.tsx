@@ -15,10 +15,16 @@ const options = [
 export default function StatusSelect({ value, onChange, disabled }: StatusSelectProps) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
+      if (
+        buttonRef.current && 
+        !buttonRef.current.contains(event.target as Node) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -27,6 +33,15 @@ export default function StatusSelect({ value, onChange, disabled }: StatusSelect
   }, []);
 
   const selected = options.find(opt => opt.value === value);
+  console.log('StatusSelect - Valor atual:', value);
+
+  const handleOptionClick = (newValue: string) => {
+    console.log('StatusSelect - Clique em opção:', { valorAtual: value, novoValor: newValue });
+    if (newValue !== value) {
+      onChange(newValue);
+    }
+    setOpen(false);
+  };
 
   return (
     <>
@@ -38,7 +53,12 @@ export default function StatusSelect({ value, onChange, disabled }: StatusSelect
           ${value === 'paid' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}
           ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         `}
-        onClick={() => !disabled && setOpen(o => !o)}
+        onClick={() => {
+          console.log('StatusSelect - Botão clicado, estado atual:', { open, disabled });
+          if (!disabled) {
+            setOpen(o => !o);
+          }
+        }}
       >
         {selected?.label}
         <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,6 +68,7 @@ export default function StatusSelect({ value, onChange, disabled }: StatusSelect
 
       {open && !disabled && createPortal(
         <div
+          ref={dropdownRef}
           className="fixed bg-[#23243a] border border-gray-700 shadow-lg rounded-xl z-[9999]"
           style={{
             top: `${buttonRef.current?.getBoundingClientRect().bottom ?? 0}px`,
@@ -61,9 +82,11 @@ export default function StatusSelect({ value, onChange, disabled }: StatusSelect
             .map(opt => (
               <button
                 key={opt.value}
-                onClick={() => {
-                  onChange(opt.value);
-                  setOpen(false);
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleOptionClick(opt.value);
                 }}
                 className={`w-full text-left px-4 py-2 text-sm ${opt.color} ${opt.bg} transition`}
               >

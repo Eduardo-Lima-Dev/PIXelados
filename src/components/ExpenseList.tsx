@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import StatusSelect from './StatusSelect'
 import { FaEdit, FaTrash } from 'react-icons/fa'
+import { toast } from 'react-hot-toast'
 
 interface ExpenseListProps {
   expenses: any[]
@@ -15,26 +16,38 @@ export default function ExpenseList({ expenses, onExpenseUpdated, currentMonth, 
 
   const handleStatusChange = async (expenseId: number, newStatus: string) => {
     try {
+      console.log('ExpenseList - Iniciando atualização de status:', { expenseId, newStatus });
+      
+      if (!expenseId || !newStatus) {
+        console.error('ExpenseList - Dados inválidos:', { expenseId, newStatus });
+        toast.error('Dados inválidos para atualização');
+        return;
+      }
+
       const response = await fetch(`/api/expenses/${expenseId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ status: newStatus }),
-      })
+      });
+
+      const data = await response.json();
+      console.log('ExpenseList - Resposta da API:', data);
 
       if (!response.ok) {
-        throw new Error('Erro ao atualizar status')
+        throw new Error(data.error || 'Erro ao atualizar status');
       }
 
-      // Atualizar a lista de despesas após a mudança
-      onExpenseUpdated()
+      toast.success('Status atualizado com sucesso!');
+      onExpenseUpdated();
     } catch (error) {
-      console.error('Erro ao atualizar status:', error)
+      console.error('ExpenseList - Erro ao atualizar status:', error);
+      toast.error('Erro ao atualizar status');
     } finally {
-      setEditingStatus(null)
+      setEditingStatus(null);
     }
-  }
+  };
 
   if (!expenses || expenses.length === 0) {
     return (
@@ -83,7 +96,10 @@ export default function ExpenseList({ expenses, onExpenseUpdated, currentMonth, 
                   <span className="lg:hidden font-medium text-gray-400 mr-2">Status:</span>
                   <StatusSelect
                     value={expense.status}
-                    onChange={(newStatus) => handleStatusChange(expense.id, newStatus)}
+                    onChange={(newStatus) => {
+                      console.log('ExpenseList - StatusSelect onChange:', { expenseId: expense.id, newStatus });
+                      handleStatusChange(expense.id, newStatus);
+                    }}
                     disabled={expense.recurring && (
                       new Date(expense.date).getMonth() !== currentMonth.month ||
                       new Date(expense.date).getFullYear() !== currentMonth.year
