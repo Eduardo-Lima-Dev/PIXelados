@@ -5,17 +5,22 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'react-hot-toast'
+import { updateExpense, createExpense, ExpenseData } from '@/lib/expenses'
 
 const expenseSchema = z.object({
   title: z.string().min(3, 'O título deve ter no mínimo 3 caracteres'),
   description: z.string().min(3, 'A descrição deve ter no mínimo 3 caracteres'),
-  amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+  amount: z.string().refine((val) => {
+    const num = Number(val.replace(',', '.'));
+    return !isNaN(num) && num > 0;
+  }, {
     message: 'O valor deve ser maior que zero',
   }),
   date: z.string().min(1, 'A data é obrigatória'),
   category: z.string().min(1, 'A categoria é obrigatória'),
   recurring: z.boolean(),
   createdById: z.string().min(1, 'Selecione quem fez a despesa'),
+  status: z.string().optional(),
 })
 
 type ExpenseFormData = z.infer<typeof expenseSchema>
@@ -32,7 +37,8 @@ interface AddExpenseModalProps {
 export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCreated, editingExpense, mode }: AddExpenseModalProps) {
   const [loading, setLoading] = useState(false)
   const [members, setMembers] = useState<any[]>([])
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ExpenseFormData>({
+  const [loadingMembers, setLoadingMembers] = useState(true)
+  const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm<ExpenseFormData>({
     resolver: zodResolver(expenseSchema),
     defaultValues: {
       recurring: false,
@@ -44,8 +50,17 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
     }
   })
 
+  const formatCurrency = (value: string | number) => {
+    const num = typeof value === 'string' ? Number(value.replace(',', '.')) : value;
+    return num.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
   useEffect(() => {
     if (isOpen && houseId) {
+      setLoadingMembers(true)
       console.log('Buscando membros para a casa:', houseId)
       // Buscar membros da casa
       fetch(`/api/houses/${houseId}/members`)
@@ -65,6 +80,9 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
           toast.error('Erro ao carregar membros da casa')
           setMembers([])
         })
+        .finally(() => {
+          setLoadingMembers(false)
+        })
     }
   }, [isOpen, houseId])
 
@@ -73,59 +91,55 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
       reset({
         title: editingExpense.title,
         description: editingExpense.description,
-        amount: editingExpense.amount,
+        amount: formatCurrency(editingExpense.amount),
         date: editingExpense.date.split('T')[0],
         category: editingExpense.category,
         recurring: editingExpense.recurring,
         createdById: String(editingExpense.createdById),
+        status: editingExpense.status || 'pending',
       });
     } else {
-      reset(); // limpa o formulário para novo
+      reset();
     }
   }, [editingExpense, reset]);
 
   const onSubmit = async (data: ExpenseFormData) => {
+    const valorNumerico = Number(data.amount.replace(/\./g, '').replace(',', '.'));
+    if (isNaN(valorNumerico) || valorNumerico <= 0) {
+      toast.error('O valor deve ser maior que zero');
+      return;
+    }
     setLoading(true)
     try {
-      let response;
+      const expenseData: ExpenseData = {
+        title: data.title,
+        description: data.description,
+        amount: valorNumerico,
+        date: data.date,
+        category: data.category,
+        recurring: data.recurring,
+        createdById: Number(data.createdById),
+        houseId,
+        status: data.status || editingExpense?.status,
+      };
+
+      console.log('Dados sendo enviados:', expenseData);
+
+      let responseData;
       if (mode === 'edit' && editingExpense) {
-        // PATCH para /api/expenses/:id
-        response = await fetch(`/api/expenses/${editingExpense.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...data,
-            amount: Number(data.amount),
-            houseId,
-          }),
-        })
+        responseData = await updateExpense(editingExpense.id, expenseData);
+        console.log('Resposta da API após atualização:', responseData);
       } else {
-        // POST normal
-        response = await fetch('/api/expenses', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...data,
-            amount: Number(data.amount),
-            houseId,
-          }),
-        })
+        responseData = await createExpense(expenseData);
       }
 
-      const responseData = await response.json()
-      console.log('Resposta da API:', responseData)
-
-      if (!response.ok) {
-        throw new Error(responseData.error || 'Erro ao criar despesa')
-      }
-
-      toast.success('Despesa criada com sucesso!')
+      toast.success(mode === 'edit' ? 'Despesa atualizada com sucesso!' : 'Despesa criada com sucesso!')
       reset()
       onClose()
       onExpenseCreated()
     } catch (error) {
-      console.error('Erro ao criar despesa:', error)
-      toast.error(error instanceof Error ? error.message : 'Erro ao criar despesa')
+      console.error('Erro ao criar/editar despesa:', error)
+      toast.error(error instanceof Error ? error.message : 'Erro ao criar/editar despesa')
     } finally {
       setLoading(false)
     }
@@ -180,12 +194,17 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
           <div>
             <label className="block text-sm font-medium text-gray-300">Valor</label>
             <div className="mt-1 relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">R$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">R$ </span>
               <input
                 type="text"
                 {...register('amount')}
-                className="pl-8 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
+                className="pl-10 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
                 placeholder="0,00"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  const num = Number(value) / 100;
+                  setValue('amount', formatCurrency(num));
+                }}
               />
             </div>
             {errors.amount && (
@@ -225,21 +244,43 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
 
           <div>
             <label className="block text-sm font-medium text-gray-300">Quem fez a despesa?</label>
-            <select
-              {...register('createdById')}
-              className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
-            >
-              <option value="">Selecione quem fez a despesa</option>
-              {members && members.length > 0 ? (
-                members.map((member) => (
-                  <option key={member.id} value={member.id}>{member.name}</option>
-                ))
-              ) : null}
-            </select>
+            {loadingMembers ? (
+              <div className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white px-4 py-3">
+                Carregando membros...
+              </div>
+            ) : (
+              <select
+                {...register('createdById')}
+                className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
+              >
+                <option value="">Selecione quem fez a despesa</option>
+                {members && members.length > 0 ? (
+                  members.map((member) => (
+                    <option key={member.id} value={member.id}>{member.name}</option>
+                  ))
+                ) : null}
+              </select>
+            )}
             {errors.createdById && (
               <p className="mt-1 text-sm text-red-400">{errors.createdById.message}</p>
             )}
           </div>
+
+          {mode === 'edit' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-300">Status</label>
+              <select
+                {...register('status')}
+                className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
+              >
+                <option value="pending">Pendente</option>
+                <option value="paid">Pago</option>
+              </select>
+              {errors.status && (
+                <p className="mt-1 text-sm text-red-400">{errors.status.message}</p>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center gap-2">
             <input
@@ -257,7 +298,11 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
             className="w-full rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 px-5 py-2 text-lg font-semibold text-white shadow-lg transition hover:brightness-110 relative group mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 blur-md opacity-50 group-hover:opacity-75 transition-opacity"></span>
-            <span className="relative">{loading ? 'Adicionando...' : 'Adicionar Despesa'}</span>
+            <span className="relative">
+              {loading 
+                ? (mode === 'edit' ? 'Salvando...' : 'Adicionando...') 
+                : (mode === 'edit' ? 'Salvar Alterações' : 'Adicionar Despesa')}
+            </span>
           </button>
         </form>
       </div>

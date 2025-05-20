@@ -17,23 +17,20 @@ export async function PATCH(
     }
 
     const body = await request.json()
-    const { status } = body
+    const { title, description, amount, date, category, recurring, createdById, houseId, status } = body
 
-    console.log('PATCH /api/expenses/[id] - Dados recebidos:', { id: params.id, status })
-
-    if (!status) {
-      return NextResponse.json(
-        { error: 'Status é obrigatório' },
-        { status: 400 }
-      )
-    }
-
-    if (status !== 'paid' && status !== 'pending') {
-      return NextResponse.json(
-        { error: 'Status inválido' },
-        { status: 400 }
-      )
-    }
+    console.log('PATCH /api/expenses/[id] - Dados recebidos:', { 
+      id: params.id, 
+      title,
+      description,
+      amount,
+      date,
+      category,
+      recurring,
+      createdById,
+      houseId,
+      status
+    })
 
     // Busca o usuário
     const user = await prisma.user.findUnique({
@@ -53,7 +50,15 @@ export async function PATCH(
         id: Number(params.id)
       },
       data: {
-        status
+        title,
+        description,
+        amount: Number(amount),
+        date: new Date(date),
+        category,
+        recurring,
+        createdById: Number(createdById),
+        houseId: Number(houseId),
+        status: status || 'pending'
       },
       include: {
         createdBy: true
