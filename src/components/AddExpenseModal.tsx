@@ -59,6 +59,32 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
   }
 
   useEffect(() => {
+    if (editingExpense) {
+      reset({
+        title: editingExpense.title,
+        description: editingExpense.description,
+        amount: formatCurrency(editingExpense.amount),
+        date: editingExpense.date.split('T')[0],
+        category: editingExpense.category,
+        recurring: editingExpense.recurring,
+        createdById: String(editingExpense.createdById),
+        status: editingExpense.status || 'pending',
+      });
+    } else {
+      reset({
+        title: '',
+        description: '',
+        amount: '',
+        date: '',
+        category: '',
+        recurring: false,
+        createdById: '',
+        status: 'pending',
+      });
+    }
+  }, [editingExpense, reset, isOpen]);
+
+  useEffect(() => {
     if (isOpen && houseId) {
       setLoadingMembers(true)
       console.log('Buscando membros para a casa:', houseId)
@@ -85,23 +111,6 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
         })
     }
   }, [isOpen, houseId])
-
-  useEffect(() => {
-    if (editingExpense) {
-      reset({
-        title: editingExpense.title,
-        description: editingExpense.description,
-        amount: formatCurrency(editingExpense.amount),
-        date: editingExpense.date.split('T')[0],
-        category: editingExpense.category,
-        recurring: editingExpense.recurring,
-        createdById: String(editingExpense.createdById),
-        status: editingExpense.status || 'pending',
-      });
-    } else {
-      reset();
-    }
-  }, [editingExpense, reset]);
 
   const onSubmit = async (data: ExpenseFormData) => {
     const valorNumerico = Number(data.amount.replace(/\./g, '').replace(',', '.'));
