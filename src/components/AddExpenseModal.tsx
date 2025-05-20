@@ -148,9 +148,9 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-[#1a2332] p-6 rounded-xl shadow-2xl max-w-md w-full">
-        <div className="flex justify-between items-center mb-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-[#1a2332] p-6 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-white">
             {mode === 'edit' ? 'Editar Despesa' : 'Nova Despesa'}
           </h2>
@@ -164,123 +164,125 @@ export default function AddExpenseModal({ isOpen, onClose, houseId, onExpenseCre
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-300">Título</label>
-            <input
-              type="text"
-              {...register('title')}
-              className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
-              placeholder="Digite o título da despesa"
-            />
-            {errors.title && (
-              <p className="mt-1 text-sm text-red-400">{errors.title.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300">Descrição</label>
-            <input
-              type="text"
-              {...register('description')}
-              className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
-              placeholder="Digite a descrição da despesa"
-            />
-            {errors.description && (
-              <p className="mt-1 text-sm text-red-400">{errors.description.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300">Valor</label>
-            <div className="mt-1 relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">R$ </span>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-300">Título</label>
               <input
                 type="text"
-                {...register('amount')}
-                className="pl-10 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
-                placeholder="0,00"
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, '');
-                  const num = Number(value) / 100;
-                  setValue('amount', formatCurrency(num));
-                }}
+                {...register('title')}
+                className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
+                placeholder="Digite o título da despesa"
               />
-            </div>
-            {errors.amount && (
-              <p className="mt-1 text-sm text-red-400">{errors.amount.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300">Data</label>
-            <input
-              type="date"
-              {...register('date')}
-              className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
-            />
-            {errors.date && (
-              <p className="mt-1 text-sm text-red-400">{errors.date.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300">Categoria</label>
-            <select
-              {...register('category')}
-              className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
-            >
-              <option value="">Selecione uma categoria</option>
-              <option value="alimentacao">Alimentação</option>
-              <option value="transporte">Transporte</option>
-              <option value="moradia">Moradia</option>
-              <option value="lazer">Lazer</option>
-              <option value="outros">Outros</option>
-            </select>
-            {errors.category && (
-              <p className="mt-1 text-sm text-red-400">{errors.category.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300">Quem fez a despesa?</label>
-            {loadingMembers ? (
-              <div className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white px-4 py-3">
-                Carregando membros...
-              </div>
-            ) : (
-              <select
-                {...register('createdById')}
-                className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
-              >
-                <option value="">Selecione quem fez a despesa</option>
-                {members && members.length > 0 ? (
-                  members.map((member) => (
-                    <option key={member.id} value={member.id}>{member.name}</option>
-                  ))
-                ) : null}
-              </select>
-            )}
-            {errors.createdById && (
-              <p className="mt-1 text-sm text-red-400">{errors.createdById.message}</p>
-            )}
-          </div>
-
-          {mode === 'edit' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-300">Status</label>
-              <select
-                {...register('status')}
-                className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
-              >
-                <option value="pending">Pendente</option>
-                <option value="paid">Pago</option>
-              </select>
-              {errors.status && (
-                <p className="mt-1 text-sm text-red-400">{errors.status.message}</p>
+              {errors.title && (
+                <p className="mt-1 text-sm text-red-400">{errors.title.message}</p>
               )}
             </div>
-          )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300">Valor</label>
+              <div className="mt-1 relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">R$ </span>
+                <input
+                  type="text"
+                  {...register('amount')}
+                  className="pl-10 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
+                  placeholder="0,00"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    const num = Number(value) / 100;
+                    setValue('amount', formatCurrency(num));
+                  }}
+                />
+              </div>
+              {errors.amount && (
+                <p className="mt-1 text-sm text-red-400">{errors.amount.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300">Descrição</label>
+              <input
+                type="text"
+                {...register('description')}
+                className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
+                placeholder="Digite a descrição da despesa"
+              />
+              {errors.description && (
+                <p className="mt-1 text-sm text-red-400">{errors.description.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300">Data</label>
+              <input
+                type="date"
+                {...register('date')}
+                className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
+              />
+              {errors.date && (
+                <p className="mt-1 text-sm text-red-400">{errors.date.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300">Categoria</label>
+              <select
+                {...register('category')}
+                className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
+              >
+                <option value="">Selecione uma categoria</option>
+                <option value="alimentacao">Alimentação</option>
+                <option value="transporte">Transporte</option>
+                <option value="moradia">Moradia</option>
+                <option value="lazer">Lazer</option>
+                <option value="outros">Outros</option>
+              </select>
+              {errors.category && (
+                <p className="mt-1 text-sm text-red-400">{errors.category.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300">Quem fez a despesa?</label>
+              {loadingMembers ? (
+                <div className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white px-4 py-3">
+                  Carregando membros...
+                </div>
+              ) : (
+                <select
+                  {...register('createdById')}
+                  className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
+                >
+                  <option value="">Selecione quem fez a despesa</option>
+                  {members && members.length > 0 ? (
+                    members.map((member) => (
+                      <option key={member.id} value={member.id}>{member.name}</option>
+                    ))
+                  ) : null}
+                </select>
+              )}
+              {errors.createdById && (
+                <p className="mt-1 text-sm text-red-400">{errors.createdById.message}</p>
+              )}
+            </div>
+
+            {mode === 'edit' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300">Status</label>
+                <select
+                  {...register('status')}
+                  className="mt-1 block w-full rounded-xl border border-cyan-900 bg-[#23243a]/70 text-white shadow-sm focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 px-4 py-3"
+                >
+                  <option value="pending">Pendente</option>
+                  <option value="paid">Pago</option>
+                </select>
+                {errors.status && (
+                  <p className="mt-1 text-sm text-red-400">{errors.status.message}</p>
+                )}
+              </div>
+            )}
+          </div>
 
           <div className="flex items-center gap-2">
             <input
