@@ -14,7 +14,6 @@ const options = [
 
 export default function StatusSelect({ value, onChange, disabled }: StatusSelectProps) {
   const [open, setOpen] = useState(false);
-  const [position, setPosition] = useState({ top: 0, left: 0, showAbove: false });
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -26,22 +25,6 @@ export default function StatusSelect({ value, onChange, disabled }: StatusSelect
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  // Atualiza a posição do dropdown sempre que abrir
-  useEffect(() => {
-    if (open && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      const dropdownHeight = 90; // altura aproximada do dropdown
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
-      const showAbove = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
-      setPosition({
-        top: showAbove ? rect.top - dropdownHeight : rect.bottom,
-        left: rect.left,
-        showAbove,
-      });
-    }
-  }, [open]);
 
   const selected = options.find(opt => opt.value === value);
 
@@ -67,8 +50,8 @@ export default function StatusSelect({ value, onChange, disabled }: StatusSelect
         <div
           className="fixed bg-[#23243a] border border-gray-700 shadow-lg rounded-xl z-[9999]"
           style={{
-            top: `${position.top}px`,
-            left: `${position.left}px`,
+            top: `${buttonRef.current?.getBoundingClientRect().bottom ?? 0}px`,
+            left: `${buttonRef.current?.getBoundingClientRect().left ?? 0}px`,
             width: '128px',
             overflow: 'hidden'
           }}
@@ -78,7 +61,10 @@ export default function StatusSelect({ value, onChange, disabled }: StatusSelect
             .map(opt => (
               <button
                 key={opt.value}
-                onClick={() => { onChange(opt.value); setOpen(false); }}
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
                 className={`w-full text-left px-4 py-2 text-sm ${opt.color} ${opt.bg} transition`}
               >
                 {opt.label}
